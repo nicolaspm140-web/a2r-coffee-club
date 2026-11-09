@@ -3,7 +3,7 @@
 <head>
   <meta charset="utf-8">
   <meta name="viewport" content="width=device-width, initial-scale=1">
-  <meta http-equiv="Content-Security-Policy" content="default-src 'none'; script-src 'sha256-NeFR0SQtoaT/WrGXKQ8KgVpDaVeSrJRvkJAvNNxLQnM='; connect-src https://vnunntuwieaspgyinpto.supabase.co; style-src 'unsafe-inline'; img-src data:; base-uri 'none'; form-action 'none'">
+  <meta http-equiv="Content-Security-Policy" content="default-src 'none'; script-src 'sha256-C+WRAd9ongqHUdDoak/p5YzK47+SKEjXgPEvc8sPq4I='; connect-src https://vnunntuwieaspgyinpto.supabase.co; style-src 'unsafe-inline'; img-src data:; base-uri 'none'; form-action 'none'">
   <meta name="theme-color" content="#eef6f7">
   <meta name="description" content="See which Vertuo capsules are available at A2R Coffee Club.">
   <title>Capsule menu · A2R Coffee Club</title>
@@ -630,7 +630,7 @@ dialog select, dialog input { min-height: 38px; width: 100%; font-weight: 400; }
           <ul class="capsule-list" id="expense-list" aria-live="polite"><li class="quiet">Loading purchases…</li></ul>
         </section>
         <section class="panel" aria-labelledby="metrics-title">
-          <header class="panel-header"><div><h2 id="metrics-title">Monthly activity</h2><p>Cash flow and stockouts over the last six months.</p></div></header>
+          <header class="panel-header"><div><h2 id="metrics-title">Monthly activity</h2><p>Cash flow and stockouts by month.</p></div></header>
           <div class="table-wrap">
             <table class="metrics-table">
               <thead><tr><th scope="col">Month</th><th scope="col">Collected</th><th scope="col">Spent</th><th scope="col">Net</th><th scope="col">Ran out</th></tr></thead>
@@ -1109,9 +1109,18 @@ function mountLedger(root, api) {
     $('fund-balance').textContent = money.format(balance);
     $('fund-balance').classList.toggle('negative', balance < 0);
     const currentMonth = day(state.today.slice(0, 7) + '-01');
-    $('metrics-body').replaceChildren(...Array.from({ length: 6 }, (_, index) => {
+    const activityDates = [
+      ...state.payments.map(row => row.paid_on),
+      ...expenses.map(row => row.purchased_on),
+      ...(stockHistory || []).map(row => row.ran_out_on)
+    ];
+    const firstMonth = activityDates.reduce((earliest, date) => date < earliest ? date : earliest, state.today).slice(0, 7);
+    const months = Array.from({ length: 6 }, (_, index) => {
       const month = new Date(currentMonth);
       month.setUTCMonth(month.getUTCMonth() - index);
+      return month;
+    }).filter(month => month.toISOString().slice(0, 7) >= firstMonth);
+    $('metrics-body').replaceChildren(...months.map(month => {
       const key = month.toISOString().slice(0, 7);
       const income = total(state.payments.filter(row => row.paid_on.startsWith(key)));
       const spent = total(expenses.filter(row => row.purchased_on.startsWith(key)));
@@ -1613,17 +1622,24 @@ function stockRow(row) {
   if (row.serving) info.append(stockElement('small', row.serving));
   info.append(stockElement('small', 'Stocked ' + row.stocked_on));
   item.append(info);
+  const actions = document.createElement('div');
+  actions.className = 'stock-actions';
   if (row.ran_out_on) {
-    item.append(stockElement('small', 'Ran out ' + row.ran_out_on));
+    info.append(stockElement('small', 'Ran out ' + row.ran_out_on));
   } else {
-    const actions = document.createElement('div');
-    actions.className = 'stock-actions';
     actions.append(
       stockAction('Edit details', name, () => editStockFlavor(row)),
       stockAction('Mark as out', name, () => markStockOut(row))
     );
-    item.append(actions);
   }
+  actions.append(stockAction('Delete entry', name, () => {
+    if (!confirm('Permanently delete this stock entry for ' + name + '?')) return;
+    saveStock(row, null, 'Stock entry deleted.', () => {
+      if (editedFlavor?.id === row.id) resetStockEditor();
+      if (outFlavor?.id === row.id) resetStockOut();
+    });
+  }));
+  item.append(actions);
   return item;
 }
 
@@ -1663,16 +1679,19 @@ async function saveStock(row, values, message, reset) {
   stockOutSave.disabled = true;
   stockStatus.textContent = 'Saving…';
   try {
+    const deleting = values === null;
     const query = row ? new URLSearchParams({
-      id: 'eq.' + row.id, updated_at: 'eq.' + row.updated_at, ran_out_on: 'is.null'
+      id: 'eq.' + row.id, updated_at: 'eq.' + row.updated_at
     }) : '';
+    if (row && !deleting) query.set('ran_out_on', 'is.null');
     const result = await backend(stockEndpoint + (row ? '?' + query : ''), {
-      method: row ? 'PATCH' : 'POST', body: values, token, prefer: 'return=representation'
+      method: deleting ? 'DELETE' : row ? 'PATCH' : 'POST',
+      body: deleting ? undefined : values, token, prefer: 'return=representation'
     });
     if (accessToken !== token) return;
     reset();
     await loadStockAdmin(result.length ? message : 'This flavor was updated elsewhere. The cupboard has been refreshed.');
-    if (values.ran_out_on) refreshOnlineLedger();
+    if (deleting || values.ran_out_on) refreshOnlineLedger();
   } catch (error) {
     if (accessToken !== token) return;
     if (error.status === 401 || error.status === 403) {
