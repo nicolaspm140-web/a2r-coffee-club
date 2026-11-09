@@ -71,7 +71,9 @@
     .brew-steps h3 { margin: 0 0 4px; font: 700 1.11rem Georgia, serif; }
     .brew-steps p { margin: 0; color: #49606c; font-size: .87rem; }
     .brew-steps .brew-overflow { margin-top: 7px; color: #092f49; }
-    footer { border-top: 1px solid #d5e6e9; padding-block: 14px 22px; color: #49606c; font-size: .85rem; }
+    footer { display: flex; flex-wrap: wrap; align-items: baseline; gap: 4px 12px; border-top: 1px solid #d5e6e9; padding-block: 14px 22px; color: #49606c; font-size: .85rem; }
+    .admin-link { margin-inline-start: auto; padding-block: 4px; color: #617278; font-size: .7rem; text-decoration: none; }
+    .admin-link:is(:hover, :focus-visible) { color: #086671; text-decoration: underline; }
     @media (max-width: 730px) {
       .brew-steps { grid-template-columns: repeat(2, minmax(0, 1fr)); }
       .suggestion-fields { grid-template-columns: 1fr; }
@@ -263,7 +265,10 @@
   <p class="section-note"><strong>Questions or need a hand?</strong> Ask <strong>Nick</strong>.</p>
 </section>
   </main>
-  <footer class="shell" id="menu-footer">Menu snapshot from 9 November 2026</footer>
+  <footer class="shell" id="menu-footer">
+    <span>Menu snapshot from 9 November 2026</span>
+    <a class="admin-link" href="?admin=1" aria-label="Suggestion admin">Admin</a>
+  </footer>
   <main class="shell admin" id="suggestion-admin" hidden>
     <a href="?preview=1">Back to capsule menu</a>
     <h1>Suggestion admin</h1>
