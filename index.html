@@ -48,8 +48,10 @@
     .suggestion-list li { display: flex; flex-wrap: wrap; justify-content: space-between; gap: 4px 12px; padding: 10px 0; border-bottom: 1px solid #d5e6e9; overflow-wrap: anywhere; }
     .suggestion-links { display: flex; flex-wrap: wrap; gap: 6px 12px; font-size: .89rem; }
     .suggestion-status:empty { display: none; }
-    .admin { margin: 24px 0; padding: 13px 15px; border: 1px solid #d5e6e9; border-radius: 13px; background: #fcffff; }
-    .admin summary { cursor: pointer; font-weight: 700; }
+    .admin { margin-inline-start: auto; }
+    .admin[open] { flex-basis: 100%; padding: 10px 15px 13px; border: 1px solid #d5e6e9; border-radius: 13px; background: #fcffff; }
+    .admin summary { display: block; width: fit-content; margin-inline-start: auto; padding: 4px 0; color: #617278; cursor: pointer; font-size: .73rem; }
+    .admin summary:is(:hover, :focus-visible), .admin[open] summary { color: #086671; text-decoration: underline; }
     .admin .suggestion-form { border: 0; padding: 10px 0 0; }
     .review { margin-top: 10px; }
     .review-toolbar { display: flex; flex-wrap: wrap; align-items: end; gap: 8px; }
@@ -71,7 +73,7 @@
     .brew-steps h3 { margin: 0 0 4px; font: 700 1.11rem Georgia, serif; }
     .brew-steps p { margin: 0; color: #49606c; font-size: .87rem; }
     .brew-steps .brew-overflow { margin-top: 7px; color: #092f49; }
-    footer { border-top: 1px solid #d5e6e9; padding-block: 14px 22px; color: #49606c; font-size: .85rem; }
+    footer { display: flex; flex-wrap: wrap; align-items: center; gap: 6px 12px; border-top: 1px solid #d5e6e9; padding-block: 14px 22px; color: #49606c; font-size: .85rem; }
     @media (max-width: 730px) {
       .brew-steps { grid-template-columns: repeat(2, minmax(0, 1fr)); }
       .suggestion-fields { grid-template-columns: 1fr; }
@@ -262,6 +264,9 @@
   <p class="section-note">For first use, rinsing or troubleshooting, see the <a href="https://www.nespresso.com/sa/en/machine-assistance/vertuo-pop-machine-assistance">official Vertuo Pop guide</a>.</p>
   <p class="section-note"><strong>Questions or need a hand?</strong> Ask <strong>Nick</strong>.</p>
 </section>
+  </main>
+  <footer class="shell">
+    <span>Menu snapshot from 9 November 2026</span>
     <details class="admin" id="suggestion-admin" hidden>
       <summary>Admin console</summary>
       <form class="suggestion-form" id="admin-login">
@@ -281,8 +286,7 @@
       </section>
       <p class="section-note suggestion-status" id="admin-status" role="status"></p>
     </details>
-    <footer>Menu snapshot from 9 November 2026</footer>
-  </main>
+  </footer>
   <script>const menuData = {"servingOptions":[{"label":"Black · as brewed"},{"label":"Over ice","recipe":"https://www.nespresso.com/recipes/us/en/22687NES-nespresso-vertuo-on-ice.html"},{"label":"Iced latte","recipe":"https://www.nespresso.com/recipes/au/en/28491FLA-vertuo-altissio-iced-latte.html"},{"label":"With 40 ml milk · club option"},{"label":"Reverso · 50 ml cold milk first","recipe":"https://www.nespresso.com/recipes/int/en/37624REV-reverso.html"},{"label":"Vanilla Almond Reverso · 40 ml oat or soy drink","recipe":"https://www.nespresso.com/coffee-blog/recetas/vanilla-almond-reverso"},{"label":"Cappuccino · frothed milk","recipe":"https://www.nespresso.com/hu/en/order/capsules/vertuo/bianco-doppio-coffee-capsule"},{"label":"Latte macchiato · milk and foam","recipe":"https://www.nespresso.com/ncp/res/generated/recipes/36191GOU_en_INT.pdf"}],"catalogRoot":"https://www.nespresso.com/hu/en/order/capsules/vertuo","products":{"altissio":"altissio-espresso-pods","altissio decaffeinato":"altissio-decaffeinato-coffee-pods","arondio":"arondio-coffee-pods","bianco doppio":"bianco-doppio-coffee-capsule","bianco forte":"bianco-forte-coffee-capsule","diavolitto":"diavolitto-espresso-pods","double espresso chiaro":"double-espresso-chiaro-coffee-pods","double espresso chiaro decaffeinato":"double-espresso-chiaro-decaffeinato","double espresso dolce":"double-espresso-dolce-coffee-pods","double espresso scuro":"double-espresso-scuro-coffee-pods","fortado":"fortado-coffee-pods","fortado decaffeinato":"fortado-decaffeinato-coffee-pods","half caffeinato":"half-caffeinato-coffee-pods","ice forte":"iced-coffee-capsule-forte-2025","ice leggero":"iced-coffee-capsule-leggero-2025","il caffe":"il-caffe-coffee-pods","inizio":"inizio-coffee-pods","intenso":"intenso-coffee-pods","melozio":"melozio-coffee-pods","odacio":"odacio-coffee-pods","orafio":"orafio-coffee-pods","rich chocolate":"rich-chocolate-flavoured-coffee-capsule","roasted hazelnut":"roasted-hazelnut-flavoured-coffee-capsule","solelio":"solelio-coffee-pods","stormio":"stormio-coffee-pods","sweet vanilla":"sweet-vanilla-flavoured-coffee-capsule","sweet vanilla decaffeinato":"sweet-vanilla-decaffeinato","voltesso":"voltesso-espresso-pods"}};
 function titleCaseFlavor(value) {
   return value.toLowerCase().replace(/(^|[^\p{L}\p{M}\p{N}'’])(\p{L})/gu,
