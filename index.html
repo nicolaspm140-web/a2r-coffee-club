@@ -3,7 +3,7 @@
 <head>
   <meta charset="utf-8">
   <meta name="viewport" content="width=device-width, initial-scale=1">
-  <meta http-equiv="Content-Security-Policy" content="default-src 'none'; script-src 'sha256-tHLtiZgfZ9dRduktT0pNheJhKVCT3hvJSjkMomgOJRk='; connect-src https://vnunntuwieaspgyinpto.supabase.co; style-src 'unsafe-inline'; img-src data:; base-uri 'none'; form-action 'none'">
+  <meta http-equiv="Content-Security-Policy" content="default-src 'none'; script-src 'sha256-B9PRQK97uhpz3Tp4wL7L8ClRQMxXnyhw/7LBK41M0A4='; connect-src https://vnunntuwieaspgyinpto.supabase.co; style-src 'unsafe-inline'; img-src data:; base-uri 'none'; form-action 'none'">
   <meta name="theme-color" content="#eef6f7">
   <meta name="description" content="See which Vertuo capsules are available at A2R Coffee Club.">
   <title>Capsule menu · A2R Coffee Club</title>
@@ -300,7 +300,7 @@
             <div class="suggestion-fields">
               <label>Flavor<input id="stock-name" maxlength="100" required placeholder="e.g. Double Espresso Chiaro"></label>
               <label>Stocked on<input id="stock-start" type="date" min="2000-01-01" required></label>
-              <label>Cup volume (ml)<input id="stock-volume" type="number" min="1" max="1000" step="1" required></label>
+              <label>Cup volume (ml)<select id="stock-volume" required></select></label>
               <label>Suggested way to drink it<select id="stock-serving" required></select></label>
             </div>
             <div class="stock-actions">
@@ -332,7 +332,7 @@
     </section>
     <p class="section-note suggestion-status" id="admin-status" role="status"></p>
   </main>
-  <script>const menuData = {"servingOptions":[{"label":"Black · as brewed"},{"label":"Over ice","recipe":"https://www.nespresso.com/ncp/res/generated/recipes/22687NES_en_INT.pdf"},{"label":"Iced latte","recipe":"https://www.nespresso.com/ncp/res/generated/recipes/28491FLA_en_AU.pdf"},{"label":"With 40 ml milk · club option"},{"label":"Reverso · 50 ml cold milk first","recipe":"https://www.nespresso.com/ncp/res/generated/recipes/37624REV_en_INT.pdf"},{"label":"Vanilla Almond Reverso · 40 ml oat or soy drink","recipe":"https://www.nespresso.com/coffee-blog/recetas/vanilla-almond-reverso"},{"label":"Cappuccino · frothed milk","capsule":"Bianco Doppio"},{"label":"Latte macchiato · milk and foam","recipe":"https://www.nespresso.com/ncp/res/generated/recipes/36191GOU_en_INT.pdf"}],"catalogRoot":"https://www.nespresso.com/hu/en/order/capsules/vertuo","products":{"altissio":"altissio-espresso-pods","altissio decaffeinato":"altissio-decaffeinato-coffee-pods","arondio":"arondio-coffee-pods","bianco doppio":"bianco-doppio-coffee-capsule","bianco forte":"bianco-forte-coffee-capsule","diavolitto":"diavolitto-espresso-pods","double espresso chiaro":"double-espresso-chiaro-coffee-pods","double espresso chiaro decaffeinato":"double-espresso-chiaro-decaffeinato","double espresso dolce":"double-espresso-dolce-coffee-pods","double espresso scuro":"double-espresso-scuro-coffee-pods","fortado":"fortado-coffee-pods","fortado decaffeinato":"fortado-decaffeinato-coffee-pods","half caffeinato":"half-caffeinato-coffee-pods","ice forte":"iced-coffee-capsule-forte-2025","ice leggero":"iced-coffee-capsule-leggero-2025","il caffe":"il-caffe-coffee-pods","inizio":"inizio-coffee-pods","intenso":"intenso-coffee-pods","melozio":"melozio-coffee-pods","odacio":"odacio-coffee-pods","orafio":"orafio-coffee-pods","rich chocolate":"rich-chocolate-flavoured-coffee-capsule","roasted hazelnut":"roasted-hazelnut-flavoured-coffee-capsule","solelio":"solelio-coffee-pods","stormio":"stormio-coffee-pods","sweet vanilla":"sweet-vanilla-flavoured-coffee-capsule","sweet vanilla decaffeinato":"sweet-vanilla-decaffeinato","voltesso":"voltesso-espresso-pods"}};
+  <script>const menuData = {"cupVolumes":[{"ml":40,"name":"Espresso"},{"ml":80,"name":"Double Espresso"},{"ml":150,"name":"Gran Lungo"},{"ml":230,"name":"Mug"},{"ml":355,"name":"Alto XL"}],"servingOptions":[{"label":"Black · as brewed"},{"label":"Over ice","recipe":"https://www.nespresso.com/ncp/res/generated/recipes/22687NES_en_INT.pdf"},{"label":"Iced latte","recipe":"https://www.nespresso.com/ncp/res/generated/recipes/28491FLA_en_AU.pdf"},{"label":"With 40 ml milk · club option"},{"label":"Reverso · 50 ml cold milk first","recipe":"https://www.nespresso.com/ncp/res/generated/recipes/37624REV_en_INT.pdf"},{"label":"Vanilla Almond Reverso · 40 ml oat or soy drink","recipe":"https://www.nespresso.com/coffee-blog/recetas/vanilla-almond-reverso"},{"label":"Cappuccino · frothed milk","capsule":"Bianco Doppio"},{"label":"Latte macchiato · milk and foam","recipe":"https://www.nespresso.com/ncp/res/generated/recipes/36191GOU_en_INT.pdf"}],"catalogRoot":"https://www.nespresso.com/hu/en/order/capsules/vertuo","products":{"altissio":"altissio-espresso-pods","altissio decaffeinato":"altissio-decaffeinato-coffee-pods","arondio":"arondio-coffee-pods","bianco doppio":"bianco-doppio-coffee-capsule","bianco forte":"bianco-forte-coffee-capsule","diavolitto":"diavolitto-espresso-pods","double espresso chiaro":"double-espresso-chiaro-coffee-pods","double espresso chiaro decaffeinato":"double-espresso-chiaro-decaffeinato","double espresso dolce":"double-espresso-dolce-coffee-pods","double espresso scuro":"double-espresso-scuro-coffee-pods","fortado":"fortado-coffee-pods","fortado decaffeinato":"fortado-decaffeinato-coffee-pods","half caffeinato":"half-caffeinato-coffee-pods","ice forte":"iced-coffee-capsule-forte-2025","ice leggero":"iced-coffee-capsule-leggero-2025","il caffe":"il-caffe-coffee-pods","inizio":"inizio-coffee-pods","intenso":"intenso-coffee-pods","melozio":"melozio-coffee-pods","odacio":"odacio-coffee-pods","orafio":"orafio-coffee-pods","rich chocolate":"rich-chocolate-flavoured-coffee-capsule","roasted hazelnut":"roasted-hazelnut-flavoured-coffee-capsule","solelio":"solelio-coffee-pods","stormio":"stormio-coffee-pods","sweet vanilla":"sweet-vanilla-flavoured-coffee-capsule","sweet vanilla decaffeinato":"sweet-vanilla-decaffeinato","voltesso":"voltesso-espresso-pods"}};
 function titleCaseFlavor(value) {
   return value.toLowerCase().replace(/(^|[^\p{L}\p{M}\p{N}'’])(\p{L})/gu,
     (_, separator, letter) => separator + letter.toUpperCase());
@@ -353,6 +353,17 @@ function setServingOptions(select, selected = '') {
   if (selected && !labels.includes(selected)) options.unshift(new Option('Existing: ' + selected, selected));
   select.replaceChildren(placeholder, ...options);
   select.value = selected;
+}
+
+function setCupVolumeOptions(select, selected = null) {
+  const placeholder = new Option('Choose a cup volume', '', true);
+  placeholder.disabled = true;
+  const options = menuData.cupVolumes.map(({ ml, name }) => new Option(ml + ' ml · ' + name, String(ml)));
+  if (selected !== null && !menuData.cupVolumes.some(({ ml }) => ml === selected)) {
+    options.push(new Option(selected + ' ml · Current volume', String(selected)));
+  }
+  select.replaceChildren(placeholder, ...options);
+  select.value = selected === null ? '' : String(selected);
 }
 
 
@@ -733,6 +744,7 @@ function resetStockEditor() {
   stockStart.readOnly = false;
   stockStart.max = cupboardDate.format(new Date());
   stockStart.value = stockStart.max;
+  setCupVolumeOptions(stockVolume);
   setServingOptions(stockServing);
   stockSave.textContent = 'Add flavor';
   stockCancel.hidden = true;
@@ -763,7 +775,7 @@ function editStockFlavor(row) {
   stockName.readOnly = true;
   stockStart.value = row.stocked_on;
   stockStart.readOnly = true;
-  stockVolume.value = row.volume_ml ?? '';
+  setCupVolumeOptions(stockVolume, row.volume_ml ?? null);
   setServingOptions(stockServing, row.serving || '');
   stockSave.textContent = 'Save details';
   stockCancel.hidden = false;
@@ -871,7 +883,7 @@ async function saveStock(row, values, message, reset) {
 
 stockEditor.addEventListener('submit', event => {
   event.preventDefault();
-  const values = { volume_ml: stockVolume.valueAsNumber, serving: stockServing.value };
+  const values = { volume_ml: Number(stockVolume.value), serving: stockServing.value };
   if (!editedFlavor) {
     const name = stockName.value.trim().replace(/\s+/gu, ' ');
     if (!name) {
