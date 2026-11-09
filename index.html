@@ -3,7 +3,7 @@
 <head>
   <meta charset="utf-8">
   <meta name="viewport" content="width=device-width, initial-scale=1">
-  <meta http-equiv="Content-Security-Policy" content="default-src 'none'; script-src 'sha256-csgtRMNZgYn3y1iv07axcfCahPr6AAGG+L0XzDVBoTY='; connect-src https://vnunntuwieaspgyinpto.supabase.co; style-src 'unsafe-inline'; img-src data:; base-uri 'none'; form-action 'none'">
+  <meta http-equiv="Content-Security-Policy" content="default-src 'none'; script-src 'sha256-tHLtiZgfZ9dRduktT0pNheJhKVCT3hvJSjkMomgOJRk='; connect-src https://vnunntuwieaspgyinpto.supabase.co; style-src 'unsafe-inline'; img-src data:; base-uri 'none'; form-action 'none'">
   <meta name="theme-color" content="#eef6f7">
   <meta name="description" content="See which Vertuo capsules are available at A2R Coffee Club.">
   <title>Capsule menu · A2R Coffee Club</title>
@@ -51,6 +51,13 @@
     .admin { margin-block: 22px; padding: 18px; border: 1px solid #d5e6e9; border-radius: 13px; background: #fcffff; }
     .admin h1 { margin: .2em 0; font-size: clamp(2rem, 6vw, 3rem); }
     .admin .suggestion-form { border: 0; padding: 10px 0 0; }
+    .admin-stock { margin-block: 18px; padding-block: 12px; border-block: 1px solid #d5e6e9; }
+    .admin-stock h2, .review h2 { margin: 0 0 6px; font: 700 1.35rem Georgia, serif; }
+    .admin-stock .suggestion-fields { grid-template-columns: repeat(2, minmax(0, 1fr)); }
+    .admin-stock select { width: 100%; min-height: 40px; padding: 7px 10px; border: 1px solid #b9d3d9; border-radius: 7px; font: inherit; }
+    .stock-actions { display: flex; flex-wrap: wrap; gap: 8px; margin-top: 8px; }
+    .stock-list small { display: block; color: #49606c; }
+    .stock-list .stock-actions { align-self: center; margin-top: 0; }
     .review { margin-top: 10px; }
     .review-toolbar { display: flex; flex-wrap: wrap; align-items: end; gap: 8px; }
     .review-toolbar label { display: grid; gap: 4px; color: #49606c; font-size: .87rem; }
@@ -77,6 +84,7 @@
     @media (max-width: 730px) {
       .brew-steps { grid-template-columns: repeat(2, minmax(0, 1fr)); }
       .suggestion-fields { grid-template-columns: 1fr; }
+      .admin-stock .suggestion-fields { grid-template-columns: 1fr; }
       .suggestion-form button { justify-self: start; }
     }
     @media (max-width: 490px) {
@@ -144,11 +152,11 @@
     </section>
     <section class="menu" aria-labelledby="available">
       <h2 id="available">Available flavors</h2>
-      <ul class="flavors">
+      <div id="public-stock-list"><ul class="flavors">
     <li class="flavor">
       <h3>Double Espresso Active</h3>
       <span class="volume">80 ml</span>
-      <p><strong>Try it</strong> Over ice · <a href="https://www.nespresso.com/recipes/us/en/22687NES-nespresso-vertuo-on-ice.html">Nespresso recipe</a></p>
+      <p><strong>Try it</strong> Over ice · <a href="https://www.nespresso.com/ncp/res/generated/recipes/22687NES_en_INT.pdf">Recipe (PDF)</a></p>
     </li>
     <li class="flavor">
       <h3>Double Espresso Scuro</h3>
@@ -163,7 +171,7 @@
     <li class="flavor">
       <h3>Cinnamon Apple Crisp</h3>
       <span class="volume">230 ml</span>
-      <p><strong>Try it</strong> Reverso · 50 ml cold milk first · <a href="https://www.nespresso.com/recipes/int/en/37624REV-reverso.html">Nespresso recipe</a></p>
+      <p><strong>Try it</strong> Reverso · 50 ml cold milk first · <a href="https://www.nespresso.com/ncp/res/generated/recipes/37624REV_en_INT.pdf">Recipe (PDF)</a></p>
     </li>
     <li class="flavor">
       <h3>Hazelnut Brownie Flavoured</h3>
@@ -174,7 +182,7 @@
       <h3>Master Origins Colombia</h3>
       <span class="volume">230 ml</span>
       <p><strong>Try it</strong> Black · as brewed</p>
-    </li></ul>
+    </li></ul></div>
     </section>
     <section class="menu" id="suggestions" data-project-url="https://vnunntuwieaspgyinpto.supabase.co" data-publishable-key="sb_publishable_DpA21cLCBPaaVOM815HjnA_vFVhMD-V" aria-labelledby="suggestions-title">
       <h2 id="suggestions-title">Suggest a coffee</h2>
@@ -197,7 +205,7 @@
   <p class="section-note">For everyday brewing on the club machine.</p>
   <aside class="brew-tip" aria-label="Picks from the cupboard">
     <p><strong>Our pick for milk or ice is an 80 ml double espresso.</strong> Use a larger mug to leave room for what you add.</p>
-    <ul class="brew-picks"><li><strong>For milk</strong> · <a href="https://www.nespresso.com/hu/en/order/capsules/vertuo/double-espresso-scuro-coffee-pods">Double Espresso Scuro</a>, Gran Lungo Fortado, Cinnamon Apple Crisp</li><li><strong>For ice</strong> · Double Espresso Active</li></ul>
+    <div id="brew-stock-picks"><ul class="brew-picks"><li><strong>For milk</strong> · <a href="https://www.nespresso.com/hu/en/order/capsules/vertuo/double-espresso-scuro-coffee-pods">Double Espresso Scuro</a>, Gran Lungo Fortado, Cinnamon Apple Crisp</li><li><strong>For ice</strong> · Double Espresso Active</li></ul></div>
   </aside>
   <ol class="brew-steps">
     <li>
@@ -266,13 +274,13 @@
 </section>
   </main>
   <footer class="shell" id="menu-footer">
-    <span>Menu snapshot from 9 November 2026</span>
-    <a class="admin-link" href="?admin=1" aria-label="Suggestion admin">Admin</a>
+    <span id="menu-date">Menu snapshot from 9 November 2026</span>
+    <a class="admin-link" href="?admin=1" aria-label="Coffee Club admin">Admin</a>
   </footer>
   <main class="shell admin" id="suggestion-admin" hidden>
     <a href="?preview=1">Back to capsule menu</a>
-    <h1>Suggestion admin</h1>
-    <p class="section-note">Sign in to hide or restore suggestions from the public menu.</p>
+    <h1>Coffee Club admin</h1>
+    <p class="section-note">Sign in to manage available coffees and suggestions on the public menu.</p>
     <form class="suggestion-form" id="admin-login">
       <div class="suggestion-fields">
         <label>Email<input id="admin-email" type="email" autocomplete="username" required></label>
@@ -280,17 +288,51 @@
         <button type="submit">Sign in</button>
       </div>
     </form>
-    <section class="review" id="admin-review" aria-label="Suggestion inbox" hidden>
+    <section class="review" id="admin-review" aria-label="Public menu management" hidden>
+      <div class="review-toolbar">
+        <button class="secondary" type="button" id="admin-logout">Sign out</button>
+      </div>
+      <section class="admin-stock" aria-labelledby="stock-admin-title">
+        <h2 id="stock-admin-title">Available coffees</h2>
+        <p class="section-note">Changes appear on the public menu when visitors open or refresh it.</p>
+        <div id="stock-admin-controls" hidden>
+          <form class="suggestion-form" id="stock-editor">
+            <div class="suggestion-fields">
+              <label>Flavor<input id="stock-name" maxlength="100" required placeholder="e.g. Double Espresso Chiaro"></label>
+              <label>Stocked on<input id="stock-start" type="date" min="2000-01-01" required></label>
+              <label>Cup volume (ml)<input id="stock-volume" type="number" min="1" max="1000" step="1" required></label>
+              <label>Suggested way to drink it<select id="stock-serving" required></select></label>
+            </div>
+            <div class="stock-actions">
+              <button type="submit" id="stock-save">Add flavor</button>
+              <button class="secondary" type="button" id="stock-cancel" hidden>Cancel edit</button>
+            </div>
+          </form>
+          <form class="suggestion-form" id="stock-out-form" hidden>
+            <label><span id="stock-out-label">Ran out on</span><input id="stock-end" type="date" required></label>
+            <div class="stock-actions">
+              <button type="submit">Save run-out date</button>
+              <button class="secondary" id="stock-out-cancel" type="button">Cancel</button>
+            </div>
+          </form>
+          <ul class="suggestion-list stock-list" id="stock-admin-list" aria-label="Available flavors"></ul>
+          <details>
+            <summary>Recent stock history</summary>
+            <ul class="suggestion-list stock-list" id="stock-admin-history" aria-label="Recent run-out dates"></ul>
+          </details>
+        </div>
+        <p class="section-note suggestion-status" id="stock-admin-status" role="status"></p>
+      </section>
+      <h2>Suggestion inbox</h2>
       <div class="review-toolbar">
         <label>Show suggestions<select id="admin-filter"><option value="approved">Visible</option><option value="declined">Hidden</option></select></label>
         <button class="secondary" type="button" id="admin-refresh">Refresh</button>
-        <button class="secondary" type="button" id="admin-logout">Sign out</button>
       </div>
       <ul class="suggestion-list" id="admin-list"></ul>
     </section>
     <p class="section-note suggestion-status" id="admin-status" role="status"></p>
   </main>
-  <script>const menuData = {"servingOptions":[{"label":"Black · as brewed"},{"label":"Over ice","recipe":"https://www.nespresso.com/recipes/us/en/22687NES-nespresso-vertuo-on-ice.html"},{"label":"Iced latte","recipe":"https://www.nespresso.com/recipes/au/en/28491FLA-vertuo-altissio-iced-latte.html"},{"label":"With 40 ml milk · club option"},{"label":"Reverso · 50 ml cold milk first","recipe":"https://www.nespresso.com/recipes/int/en/37624REV-reverso.html"},{"label":"Vanilla Almond Reverso · 40 ml oat or soy drink","recipe":"https://www.nespresso.com/coffee-blog/recetas/vanilla-almond-reverso"},{"label":"Cappuccino · frothed milk","recipe":"https://www.nespresso.com/hu/en/order/capsules/vertuo/bianco-doppio-coffee-capsule"},{"label":"Latte macchiato · milk and foam","recipe":"https://www.nespresso.com/ncp/res/generated/recipes/36191GOU_en_INT.pdf"}],"catalogRoot":"https://www.nespresso.com/hu/en/order/capsules/vertuo","products":{"altissio":"altissio-espresso-pods","altissio decaffeinato":"altissio-decaffeinato-coffee-pods","arondio":"arondio-coffee-pods","bianco doppio":"bianco-doppio-coffee-capsule","bianco forte":"bianco-forte-coffee-capsule","diavolitto":"diavolitto-espresso-pods","double espresso chiaro":"double-espresso-chiaro-coffee-pods","double espresso chiaro decaffeinato":"double-espresso-chiaro-decaffeinato","double espresso dolce":"double-espresso-dolce-coffee-pods","double espresso scuro":"double-espresso-scuro-coffee-pods","fortado":"fortado-coffee-pods","fortado decaffeinato":"fortado-decaffeinato-coffee-pods","half caffeinato":"half-caffeinato-coffee-pods","ice forte":"iced-coffee-capsule-forte-2025","ice leggero":"iced-coffee-capsule-leggero-2025","il caffe":"il-caffe-coffee-pods","inizio":"inizio-coffee-pods","intenso":"intenso-coffee-pods","melozio":"melozio-coffee-pods","odacio":"odacio-coffee-pods","orafio":"orafio-coffee-pods","rich chocolate":"rich-chocolate-flavoured-coffee-capsule","roasted hazelnut":"roasted-hazelnut-flavoured-coffee-capsule","solelio":"solelio-coffee-pods","stormio":"stormio-coffee-pods","sweet vanilla":"sweet-vanilla-flavoured-coffee-capsule","sweet vanilla decaffeinato":"sweet-vanilla-decaffeinato","voltesso":"voltesso-espresso-pods"}};
+  <script>const menuData = {"servingOptions":[{"label":"Black · as brewed"},{"label":"Over ice","recipe":"https://www.nespresso.com/ncp/res/generated/recipes/22687NES_en_INT.pdf"},{"label":"Iced latte","recipe":"https://www.nespresso.com/ncp/res/generated/recipes/28491FLA_en_AU.pdf"},{"label":"With 40 ml milk · club option"},{"label":"Reverso · 50 ml cold milk first","recipe":"https://www.nespresso.com/ncp/res/generated/recipes/37624REV_en_INT.pdf"},{"label":"Vanilla Almond Reverso · 40 ml oat or soy drink","recipe":"https://www.nespresso.com/coffee-blog/recetas/vanilla-almond-reverso"},{"label":"Cappuccino · frothed milk","capsule":"Bianco Doppio"},{"label":"Latte macchiato · milk and foam","recipe":"https://www.nespresso.com/ncp/res/generated/recipes/36191GOU_en_INT.pdf"}],"catalogRoot":"https://www.nespresso.com/hu/en/order/capsules/vertuo","products":{"altissio":"altissio-espresso-pods","altissio decaffeinato":"altissio-decaffeinato-coffee-pods","arondio":"arondio-coffee-pods","bianco doppio":"bianco-doppio-coffee-capsule","bianco forte":"bianco-forte-coffee-capsule","diavolitto":"diavolitto-espresso-pods","double espresso chiaro":"double-espresso-chiaro-coffee-pods","double espresso chiaro decaffeinato":"double-espresso-chiaro-decaffeinato","double espresso dolce":"double-espresso-dolce-coffee-pods","double espresso scuro":"double-espresso-scuro-coffee-pods","fortado":"fortado-coffee-pods","fortado decaffeinato":"fortado-decaffeinato-coffee-pods","half caffeinato":"half-caffeinato-coffee-pods","ice forte":"iced-coffee-capsule-forte-2025","ice leggero":"iced-coffee-capsule-leggero-2025","il caffe":"il-caffe-coffee-pods","inizio":"inizio-coffee-pods","intenso":"intenso-coffee-pods","melozio":"melozio-coffee-pods","odacio":"odacio-coffee-pods","orafio":"orafio-coffee-pods","rich chocolate":"rich-chocolate-flavoured-coffee-capsule","roasted hazelnut":"roasted-hazelnut-flavoured-coffee-capsule","solelio":"solelio-coffee-pods","stormio":"stormio-coffee-pods","sweet vanilla":"sweet-vanilla-flavoured-coffee-capsule","sweet vanilla decaffeinato":"sweet-vanilla-decaffeinato","voltesso":"voltesso-espresso-pods"}};
 function titleCaseFlavor(value) {
   return value.toLowerCase().replace(/(^|[^\p{L}\p{M}\p{N}'’])(\p{L})/gu,
     (_, separator, letter) => separator + letter.toUpperCase());
@@ -301,6 +343,64 @@ function productMatch(name) {
     .replace(/[^a-z0-9]+/g, ' ').trim();
   const slug = Object.hasOwn(menuData.products, key) ? menuData.products[key] : '';
   return slug ? menuData.catalogRoot + '/' + slug : '';
+}
+
+function setServingOptions(select, selected = '') {
+  const labels = menuData.servingOptions.map(option => option.label);
+  const placeholder = new Option('Choose a serving style', '', true);
+  placeholder.disabled = true;
+  const options = labels.map(label => new Option(label, label));
+  if (selected && !labels.includes(selected)) options.unshift(new Option('Existing: ' + selected, selected));
+  select.replaceChildren(placeholder, ...options);
+  select.value = selected;
+}
+
+
+const htmlEntities = { '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;', "'": '&#39;' };
+const escapeHtml = value => String(value).replace(/[&<>"']/g, character => htmlEntities[character]);
+
+function isDoubleEspresso(entry) {
+  return entry.volume_ml === 80 ||
+    (entry.volume_ml === null && /\bdouble espresso\b/i.test(entry.name));
+}
+
+function brewRecommendations(entries) {
+  const milkStyle = /\b(?:milk|latte|cappuccino|macchiato|reverso|oat|soy|bianco)\b/i;
+  const iceStyle = /\b(?:ice|iced|cold brew)\b/i;
+  const picks = [
+    ['For milk', entries.filter(entry => milkStyle.test(entry.name + ' ' + (entry.serving || '')))],
+    ['For ice', entries.filter(entry => iceStyle.test(entry.name + ' ' + (entry.serving || '')))]
+  ];
+  const listed = new Set(picks.flatMap(([, flavors]) => flavors));
+  picks.push(['Other double espressos on hand', entries.filter(entry => isDoubleEspresso(entry) && !listed.has(entry))]);
+  const recommendationList = picks.filter(([, flavors]) => flavors.length).map(([style, flavors]) => {
+    const names = flavors.sort((a, b) => Number(isDoubleEspresso(b)) - Number(isDoubleEspresso(a)))
+      .map(entry => {
+        const name = escapeHtml(titleCaseFlavor(entry.name));
+        const product = productMatch(entry.name);
+        return product ? `<a href="${escapeHtml(product)}">${name}</a>` : name;
+      }).join(', ');
+    return `<li><strong>${style}</strong> · ${names}</li>`;
+  }).join('');
+  return recommendationList ? `<ul class="brew-picks">${recommendationList}</ul>`
+    : '<p class="brew-stock-note">There are no double espressos or milk or ice picks in the current stock.</p>';
+}
+
+function flavorCards(entries) {
+  const cards = entries.map(({ name, volume_ml, serving }) => {
+    const option = menuData.servingOptions.find(option => option.label === serving);
+    const recipe = option?.recipe;
+    const capsule = option?.capsule && productMatch(option.capsule);
+    const link = recipe || capsule;
+    const linkLabel = capsule ? 'View capsule' : recipe?.endsWith('.pdf') ? 'Recipe (PDF)' : 'Nespresso recipe';
+    return `
+    <li class="flavor">
+      <h3>${escapeHtml(titleCaseFlavor(name))}</h3>
+      ${volume_ml === null ? '' : `<span class="volume">${escapeHtml(volume_ml)} ml</span>`}
+      ${serving ? `<p><strong>Try it</strong> ${escapeHtml(serving)}${link ? ` · <a href="${escapeHtml(link)}">${linkLabel}</a>` : ''}</p>` : ''}
+    </li>`;
+  }).join('');
+  return cards ? `<ul class="flavors">${cards}</ul>` : '<p class="empty">The cupboard is empty right now.</p>';
 }
 
 const byId = id => document.getElementById(id);
@@ -343,7 +443,7 @@ function updateCatalogLink() {
 function productLink(entry) {
   const product = officialProduct(entry.product_url) || productMatch(entry.flavor);
   const link = document.createElement('a');
-  link.textContent = product ? 'View on Nespresso' : 'Browse Vertuo capsules';
+  link.textContent = product ? 'View capsule on Nespresso' : 'Browse Vertuo capsules';
   link.href = product || menuData.catalogRoot;
   return link;
 }
@@ -360,6 +460,7 @@ async function backend(path, { method = 'GET', body, token, prefer } = {}) {
   if (!response.ok) {
     const error = new Error('Could not connect to the suggestion inbox.');
     error.status = response.status;
+    error.code = (await response.json().catch(() => null))?.code;
     throw error;
   }
   return response.status === 204 ? null : response.json();
@@ -444,6 +545,7 @@ function clearAdmin(message = '') {
   inboxRequest++;
   clearTimeout(expiryTimer);
   reviewList.replaceChildren();
+  clearStockAdmin();
   review.hidden = true;
   loginForm.hidden = false;
   byId('admin-password').value = '';
@@ -478,7 +580,7 @@ loginForm.addEventListener('submit', async event => {
     loginForm.hidden = true;
     review.hidden = false;
     reviewFilter.value = 'approved';
-    await loadInbox();
+    await Promise.all([loadInbox(), loadStockAdmin()]);
   } catch {
     clearAdmin('Couldn’t sign in. Check your email and password, then try again.');
   } finally {
@@ -560,7 +662,7 @@ if (adminView) {
   byId('public-menu').hidden = true;
   byId('menu-footer').hidden = true;
   byId('suggestion-admin').hidden = false;
-  document.title = 'Suggestion admin · A2R Coffee Club';
+  document.title = 'Coffee Club admin · A2R Coffee Club';
   if (!connected) {
     loginForm.hidden = true;
     reviewStatus.textContent = 'Connect public suggestions in the Windows app to use the inbox.';
@@ -571,6 +673,222 @@ if (adminView) {
 } else {
   submissionStatus.textContent = 'Suggestions will open once the club connects its inbox.';
   publicStatus.textContent = '';
-}</script>
+}
+
+
+const stockControls = byId('stock-admin-controls');
+const stockStatus = byId('stock-admin-status');
+const stockEditor = byId('stock-editor');
+const stockOutForm = byId('stock-out-form');
+const stockName = byId('stock-name');
+const stockStart = byId('stock-start');
+const stockVolume = byId('stock-volume');
+const stockServing = byId('stock-serving');
+const stockSave = byId('stock-save');
+const stockCancel = byId('stock-cancel');
+const stockEnd = byId('stock-end');
+const stockOutSave = stockOutForm.querySelector('button[type="submit"]');
+const stockEndpoint = '/rest/v1/coffee_stock';
+const stockColumns = 'id,name,volume_ml,serving,stocked_on,ran_out_on,updated_at';
+const cupboardDate = new Intl.DateTimeFormat('en-CA', {
+  timeZone: 'Europe/Budapest', year: 'numeric', month: '2-digit', day: '2-digit'
+});
+let editedFlavor;
+let outFlavor;
+let stockPending = false;
+
+async function loadPublicStock() {
+  try {
+    const rows = await backend('/rest/v1/rpc/coffee_menu_stock');
+    if (!Array.isArray(rows)) return;
+    byId('public-stock-list').innerHTML = flavorCards(rows);
+    byId('brew-stock-picks').innerHTML = brewRecommendations(rows);
+    byId('menu-date').textContent = 'Live capsule menu';
+  } catch {
+    // Keep the dated menu snapshot available if the live cupboard is unavailable.
+  }
+}
+
+function stockElement(tag, text) {
+  const element = document.createElement(tag);
+  element.textContent = text;
+  return element;
+}
+
+function stockAction(label, name, action) {
+  const button = stockElement('button', label);
+  button.type = 'button';
+  button.className = 'secondary';
+  button.setAttribute('aria-label', label + ' for ' + name);
+  button.addEventListener('click', () => {
+    if (!stockPending) action();
+  });
+  return button;
+}
+
+function resetStockEditor() {
+  editedFlavor = undefined;
+  stockEditor.reset();
+  stockName.readOnly = false;
+  stockStart.readOnly = false;
+  stockStart.max = cupboardDate.format(new Date());
+  stockStart.value = stockStart.max;
+  setServingOptions(stockServing);
+  stockSave.textContent = 'Add flavor';
+  stockCancel.hidden = true;
+}
+
+function resetStockOut() {
+  outFlavor = undefined;
+  stockOutForm.hidden = true;
+  stockOutForm.reset();
+}
+
+function clearStockAdmin() {
+  stockControls.hidden = true;
+  stockStatus.textContent = '';
+  byId('stock-admin-list').replaceChildren();
+  byId('stock-admin-history').replaceChildren();
+  stockPending = false;
+  stockSave.disabled = false;
+  stockOutSave.disabled = false;
+  resetStockEditor();
+  resetStockOut();
+}
+
+function editStockFlavor(row) {
+  resetStockOut();
+  editedFlavor = row;
+  stockName.value = row.name;
+  stockName.readOnly = true;
+  stockStart.value = row.stocked_on;
+  stockStart.readOnly = true;
+  stockVolume.value = row.volume_ml ?? '';
+  setServingOptions(stockServing, row.serving || '');
+  stockSave.textContent = 'Save details';
+  stockCancel.hidden = false;
+  stockVolume.focus();
+}
+
+function markStockOut(row) {
+  resetStockEditor();
+  outFlavor = row;
+  stockEnd.min = row.stocked_on;
+  stockEnd.max = cupboardDate.format(new Date());
+  stockEnd.value = stockEnd.max;
+  byId('stock-out-label').textContent = 'When did ' + titleCaseFlavor(row.name) + ' run out?';
+  stockOutForm.hidden = false;
+  stockEnd.focus();
+}
+
+function stockRow(row) {
+  const item = document.createElement('li');
+  const info = document.createElement('div');
+  const name = titleCaseFlavor(row.name);
+  info.append(stockElement('strong', name));
+  if (row.volume_ml !== null) info.append(stockElement('small', row.volume_ml + ' ml'));
+  if (row.serving) info.append(stockElement('small', row.serving));
+  info.append(stockElement('small', 'Stocked ' + row.stocked_on));
+  item.append(info);
+  if (row.ran_out_on) {
+    item.append(stockElement('small', 'Ran out ' + row.ran_out_on));
+  } else {
+    const actions = document.createElement('div');
+    actions.className = 'stock-actions';
+    actions.append(
+      stockAction('Edit details', name, () => editStockFlavor(row)),
+      stockAction('Mark as out', name, () => markStockOut(row))
+    );
+    item.append(actions);
+  }
+  return item;
+}
+
+async function loadStockAdmin(message = '') {
+  const token = accessToken;
+  if (!token) return;
+  try {
+    const activeQuery = new URLSearchParams({ select: stockColumns, ran_out_on: 'is.null', order: 'volume_ml.asc.nullslast,name.asc' });
+    const historyQuery = new URLSearchParams({ select: stockColumns, ran_out_on: 'not.is.null', order: 'ran_out_on.desc,name.asc', limit: '100' });
+    const [active, history] = await Promise.all([
+      backend(stockEndpoint + '?' + activeQuery, { token }),
+      backend(stockEndpoint + '?' + historyQuery, { token })
+    ]);
+    if (accessToken !== token) return;
+    byId('stock-admin-list').replaceChildren(...(active.length ? active.map(stockRow) : [stockElement('li', 'No flavors available.')]));
+    byId('stock-admin-history').replaceChildren(...(history.length ? history.map(stockRow) : [stockElement('li', 'No run-out dates recorded yet.')]));
+    if (stockControls.hidden) resetStockEditor();
+    stockControls.hidden = false;
+    stockStatus.textContent = message;
+  } catch (error) {
+    if (accessToken !== token) return;
+    if (error.status === 401 || error.status === 403) {
+      clearAdmin('Sign in again to manage the cupboard.');
+    } else {
+      stockStatus.textContent = error.code === 'PGRST205'
+        ? 'The live cupboard is awaiting database setup.'
+        : [message, 'Could not load the cupboard. Refresh the page to try again.'].filter(Boolean).join(' ');
+    }
+  }
+}
+
+async function saveStock(row, values, message, reset) {
+  const token = accessToken;
+  if (!token || stockPending) return;
+  stockPending = true;
+  stockSave.disabled = true;
+  stockOutSave.disabled = true;
+  stockStatus.textContent = 'Saving…';
+  try {
+    const query = row ? new URLSearchParams({
+      id: 'eq.' + row.id, updated_at: 'eq.' + row.updated_at, ran_out_on: 'is.null'
+    }) : '';
+    const result = await backend(stockEndpoint + (row ? '?' + query : ''), {
+      method: row ? 'PATCH' : 'POST', body: values, token, prefer: 'return=representation'
+    });
+    if (accessToken !== token) return;
+    reset();
+    await loadStockAdmin(result.length ? message : 'This flavor was updated elsewhere. The cupboard has been refreshed.');
+  } catch (error) {
+    if (accessToken !== token) return;
+    if (error.status === 401 || error.status === 403) {
+      clearAdmin('Sign in again to manage the cupboard.');
+    } else if (error.code === '23505') {
+      stockStatus.textContent = 'That flavor is already available.';
+    } else if (error.code === '22023' || error.code === '23514') {
+      stockStatus.textContent = 'Check the dates and details. Stock periods for the same flavor cannot overlap.';
+    } else {
+      stockStatus.textContent = 'Could not save the flavor. Refresh the cupboard before trying again.';
+    }
+  } finally {
+    if (accessToken === token) {
+      stockPending = false;
+      stockSave.disabled = false;
+      stockOutSave.disabled = false;
+    }
+  }
+}
+
+stockEditor.addEventListener('submit', event => {
+  event.preventDefault();
+  const values = { volume_ml: stockVolume.valueAsNumber, serving: stockServing.value };
+  if (!editedFlavor) {
+    const name = stockName.value.trim().replace(/\s+/gu, ' ');
+    if (!name) {
+      stockStatus.textContent = 'Enter a flavor name.';
+      stockName.focus();
+      return;
+    }
+    Object.assign(values, { id: crypto.randomUUID(), name: titleCaseFlavor(name), stocked_on: stockStart.value });
+  }
+  saveStock(editedFlavor, values, editedFlavor ? 'Serving details saved.' : 'Flavor added.', resetStockEditor);
+});
+stockOutForm.addEventListener('submit', event => {
+  event.preventDefault();
+  if (outFlavor) saveStock(outFlavor, { ran_out_on: stockEnd.value }, 'Run-out date saved.', resetStockOut);
+});
+stockCancel.addEventListener('click', () => { if (!stockPending) resetStockEditor(); });
+byId('stock-out-cancel').addEventListener('click', () => { if (!stockPending) resetStockOut(); });
+if (connected && !adminView) loadPublicStock();</script>
 </body>
 </html>
