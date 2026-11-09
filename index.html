@@ -44,7 +44,9 @@
     .suggestion-form button, .review button { cursor: pointer; border: 1px solid transparent; background: #063550; color: #f8ffff; font-size: .86rem; font-weight: 650; }
     .suggestion-form button:disabled, .review button:disabled { opacity: .55; cursor: default; }
     .suggestion-form p { margin: 9px 0 0; font-size: .87rem; color: #49606c; }
+    .suggestions-heading { margin: 18px 0 0; font: 700 1.1rem Georgia, serif; }
     .suggestion-list { list-style: none; padding: 0; margin: 10px 0; }
+    .suggestions-heading + .suggestion-list { margin-top: 0; }
     .suggestion-list li { display: flex; flex-wrap: wrap; justify-content: space-between; gap: 4px 12px; padding: 10px 0; border-bottom: 1px solid #d5e6e9; overflow-wrap: anywhere; }
     .suggestion-links { display: flex; flex-wrap: wrap; gap: 6px 12px; font-size: .89rem; }
     .suggestion-status:empty { display: none; }
@@ -186,7 +188,7 @@
     </section>
     <section class="menu" id="suggestions" data-project-url="https://vnunntuwieaspgyinpto.supabase.co" data-publishable-key="sb_publishable_DpA21cLCBPaaVOM815HjnA_vFVhMD-V" aria-labelledby="suggestions-title">
       <h2 id="suggestions-title">Suggest a coffee</h2>
-      <p class="section-note">Tell us which Vertuo capsule you’d like to try next. Suggestions appear below as soon as they’re sent.</p>
+      <p class="section-note">Tell us which Vertuo capsule you’d like to try next.</p>
       <form class="suggestion-form" id="suggestion-form">
         <div class="suggestion-fields">
           <label>Capsule name<input id="suggestion-flavor" maxlength="100" required placeholder="e.g. Ice Leggero"></label>
@@ -196,7 +198,8 @@
         <p><a href="https://www.nespresso.com/hu/en/order/capsules/vertuo" id="suggestion-catalog">Browse the Nespresso Vertuo catalog</a></p>
         <p id="submission-status" role="status"></p>
       </form>
-      <ul class="suggestion-list" id="suggestion-list" aria-label="Coffee suggestions"></ul>
+      <h3 class="suggestions-heading" id="suggested-coffees">Suggested coffees</h3>
+      <ul class="suggestion-list" id="suggestion-list" aria-labelledby="suggested-coffees"></ul>
       <p class="section-note suggestion-status" id="suggestion-status" role="status">Loading suggestions…</p>
       <noscript><p>Enable JavaScript to send or read suggestions here.</p></noscript>
     </section>
