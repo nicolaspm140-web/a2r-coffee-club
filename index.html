@@ -3,7 +3,7 @@
 <head>
   <meta charset="utf-8">
   <meta name="viewport" content="width=device-width, initial-scale=1">
-  <meta http-equiv="Content-Security-Policy" content="default-src 'none'; script-src 'sha256-B9PRQK97uhpz3Tp4wL7L8ClRQMxXnyhw/7LBK41M0A4='; connect-src https://vnunntuwieaspgyinpto.supabase.co; style-src 'unsafe-inline'; img-src data:; base-uri 'none'; form-action 'none'">
+  <meta http-equiv="Content-Security-Policy" content="default-src 'none'; script-src 'sha256-NeFR0SQtoaT/WrGXKQ8KgVpDaVeSrJRvkJAvNNxLQnM='; connect-src https://vnunntuwieaspgyinpto.supabase.co; style-src 'unsafe-inline'; img-src data:; base-uri 'none'; form-action 'none'">
   <meta name="theme-color" content="#eef6f7">
   <meta name="description" content="See which Vertuo capsules are available at A2R Coffee Club.">
   <title>Capsule menu · A2R Coffee Club</title>
@@ -294,7 +294,26 @@
     <section class="review" id="admin-review" aria-label="Public menu management" hidden>
       <div class="review-toolbar">
         <button class="secondary" type="button" id="admin-logout">Sign out</button>
+        <a href="#admin-members-title">Members and fund</a>
+        <a href="#stock-admin-title">Available coffees</a>
+        <a href="#admin-inbox-title">Suggestions</a>
       </div>
+      <section class="admin-stock" aria-labelledby="admin-members-title">
+        <h2 id="admin-members-title">Members and fund</h2>
+        <p class="section-note suggestion-status" id="online-ledger-status" role="status"></p>
+        <div id="online-ledger"></div>
+        <details id="ledger-backup-tools" hidden>
+          <summary>Ledger backup and import</summary>
+          <form class="suggestion-form" id="ledger-import-form">
+            <p>Import a Windows ledger backup while the online ledger is empty.</p>
+            <label>Ledger backup file<input id="ledger-import-file" type="file" accept=".json,application/json" required></label>
+            <div class="stock-actions">
+              <button type="submit">Import backup</button>
+              <button class="secondary" id="ledger-download" type="button">Download online backup</button>
+            </div>
+          </form>
+        </details>
+      </section>
       <section class="admin-stock" aria-labelledby="stock-admin-title">
         <h2 id="stock-admin-title">Available coffees</h2>
         <p class="section-note">Changes appear on the public menu when visitors open or refresh it.</p>
@@ -303,7 +322,7 @@
             <div class="suggestion-fields">
               <label>Flavor<input id="stock-name" maxlength="100" required placeholder="e.g. Double Espresso Chiaro"></label>
               <label>Stocked on<input id="stock-start" type="date" min="2000-01-01" required></label>
-              <label>Cup volume (ml)<select id="stock-volume" required></select></label>
+              <label>Cup volume (ml)<select id="stock-volume" required><option value="" disabled selected>Choose a cup volume</option><option value="40">40 ml · Espresso</option><option value="80">80 ml · Double Espresso</option><option value="150">150 ml · Gran Lungo</option><option value="230">230 ml · Mug</option><option value="355">355 ml · Alto XL</option></select></label>
               <label>Suggested way to drink it<select id="stock-serving" required></select></label>
             </div>
             <div class="stock-actions">
@@ -326,7 +345,7 @@
         </div>
         <p class="section-note suggestion-status" id="stock-admin-status" role="status"></p>
       </section>
-      <h2>Suggestion inbox</h2>
+      <h2 id="admin-inbox-title">Suggestion inbox</h2>
       <div class="review-toolbar">
         <label>Show suggestions<select id="admin-filter"><option value="approved">Visible</option><option value="declined">Hidden</option></select></label>
         <button class="secondary" type="button" id="admin-refresh">Refresh</button>
@@ -335,6 +354,333 @@
     </section>
     <p class="section-note suggestion-status" id="admin-status" role="status"></p>
   </main>
+  <template id="online-ledger-template">
+    <style>:host { display: block; }
+:host {
+  color-scheme: light;
+  --paper: #eef6f7;
+  --surface: #fcffff;
+  --ink: #092f49;
+  --muted: #49606c;
+  --line: #d5e6e9;
+  --espresso: #063550;
+  --orange: #05767a;
+  --green: #35543d;
+  --amber: #76490c;
+  --rose: #933d33;
+  font-family: "Segoe UI", system-ui, sans-serif;
+  color: var(--ink);
+  background: var(--paper);
+  font-synthesis: none;
+}
+*, *::before, *::after { box-sizing: border-box; }
+[hidden] { display: none !important; }
+body { margin: 0; }
+button, input, select { font: inherit; }
+button { cursor: pointer; }
+button:disabled { opacity: .58; cursor: default; }
+button:focus-visible, a:focus-visible, input:focus-visible, select:focus-visible { outline: 2px solid #05767a; outline-offset: 3px; }
+h1, h2, h3, p { margin: 0; }
+.shell { width: min(1220px, calc(100% - 64px)); margin-inline: auto; }
+.topbar { border-bottom: 1px solid var(--line); background: #fbffff; }
+.topbar-inner { min-height: 66px; display: flex; align-items: center; justify-content: space-between; }
+.brand { display: inline-flex; align-items: center; gap: 11px; text-decoration: none; color: var(--ink); font: 700 20px Georgia, serif; }
+.brand-lockup { position: relative; display: block; width: 86px; height: 56px; overflow: hidden; background: #fff; }
+.brand-lockup img { position: absolute; display: block; inset: -12px auto auto -12px; }
+.brand > span:last-child { border-left: 1px solid var(--line); padding-left: 12px; }
+.private-tag, .count-tag { display: inline-flex; gap: 7px; align-items: center; padding: 5px 10px; border: 1px solid var(--line); border-radius: 99px; color: var(--muted); font-size: .77rem; white-space: nowrap; }
+.private-tag span, .eyebrow span { width: 6px; height: 6px; border-radius: 50%; display: inline-block; background: #088884; }
+.hero { position: relative; isolation: isolate; overflow: hidden; margin-block: 30px 20px; min-height: 272px; padding: 33px 38px; background: radial-gradient(ellipse at 80% 38%, #14566b, #062c47 72%); border-radius: 20px; color: #f0fbfb; display: flex; align-items: center; justify-content: space-between; }
+.hero-copy { position: relative; z-index: 1; }
+.eyebrow { display: flex; align-items: center; gap: 8px; color: #096c74; text-transform: uppercase; letter-spacing: .14em; font-size: .66rem; font-weight: 750; }
+.eyebrow span { background: #078887; }
+.hero .eyebrow { color: #97ede2; }
+.hero .eyebrow span { background: #59ded0; }
+h1 { font: 500 clamp(3.2rem, 6vw, 5.1rem)/1.03 Georgia, serif; letter-spacing: -.055em; margin: 8px 0 10px; }
+.hero-description { max-width: 365px; font-size: .94rem; line-height: 1.55; color: #d2e9ed; margin-bottom: 20px; }
+.primary, .secondary { display: inline-flex; align-items: center; justify-content: center; gap: 8px; min-height: 39px; padding: 8px 14px; font-size: .83rem; font-weight: 650; border: 1px solid transparent; border-radius: 8px; }
+.primary { color: #f8ffff; background: var(--espresso); }
+.primary:hover:not(:disabled) { background: #0b5266; }
+.hero .primary { background: #61dfcf; color: #082c44; }
+.hero .primary:hover:not(:disabled) { background: #9ef5e6; }
+.plus { font-size: 1.25rem; line-height: .8; }
+.secondary { color: var(--espresso); background: var(--surface); border-color: var(--line); }
+.secondary:hover:not(:disabled) { background: #e7f5f4; }
+.hero-art { align-self: center; width: min(42%, 400px); height: auto; margin: -12px 15px -12px 0; }
+.overview { display: grid; grid-template-columns: repeat(3, 1fr); gap: 14px; margin-bottom: 20px; }
+.stat, .panel { background: var(--surface); border: 1px solid var(--line); border-radius: 14px; }
+.stat { display: flex; align-items: flex-start; gap: 13px; padding: 17px 20px; }
+.stat-icon { flex: 0 0 35px; height: 35px; display: grid; place-items: center; border-radius: 9px; font-size: 1.08rem; font-weight: 650; }
+.green { background: #edf2e8; color: var(--green); }
+.amber { background: #faefd9; color: var(--amber); }
+.rose { background: #f8e9e3; color: var(--rose); }
+.stat p { color: var(--muted); font-size: .79rem; }
+.stat strong { display: block; font: 500 29px/1.05 Georgia, serif; margin: 4px 0; }
+.stat small { font-size: .73rem; color: var(--muted); }
+.workspace { display: grid; grid-template-columns: minmax(0, 1fr) 288px; gap: 16px; align-items: start; }
+.panel-header { display: flex; justify-content: space-between; align-items: flex-start; gap: 8px; padding: 19px 19px 12px; }
+h2 { font: 600 25px/1.15 Georgia, serif; letter-spacing: -.025em; }
+.panel-header p:not(.eyebrow), .quiet, .empty { font-size: .82rem; color: var(--muted); line-height: 1.45; }
+.panel-header p:not(.eyebrow) { margin-top: 5px; }
+.controls { display: flex; flex-wrap: wrap; align-items: center; gap: 9px; padding: 0 19px 13px; }
+.search { display: inline-flex; align-items: center; gap: 7px; min-width: 0; border: 1px solid var(--line); border-radius: 8px; padding: 0 9px; color: var(--muted); }
+.search span { display: grid; place-items: center; }
+.search input { width: 145px; min-width: 0; padding: 7px 0; border: 0; background: transparent; color: var(--ink); font-size: .8rem; }
+.search input:focus { outline: 0; }
+.search:focus-within { outline: 2px solid #05767a; outline-offset: 2px; }
+select, dialog input, .capsule-form input { padding: 7px 9px; border: 1px solid var(--line); border-radius: 8px; background: var(--surface); color: var(--ink); font-size: .8rem; min-height: 34px; }
+.empty { display: grid; min-height: 151px; align-content: center; justify-items: center; gap: 8px; padding: 16px; text-align: center; border-top: 1px solid var(--line); }
+.empty strong { color: var(--ink); font: 600 17px Georgia, serif; }
+.empty-mark { display: grid; place-items: center; width: 34px; height: 34px; border-radius: 10px; background: #e3f4f2; color: var(--orange); font-size: 18px; }
+.table-wrap { overflow: auto; }
+table { border-collapse: collapse; width: 100%; font-size: .79rem; white-space: nowrap; }
+th, td { text-align: left; padding: 11px 8px; }
+th:first-child, td:first-child { padding-left: 19px; }
+th:last-child, td:last-child { padding-right: 19px; }
+th { background: #eaf4f5; color: var(--muted); font-weight: 650; }
+td { border-top: 1px solid #e1ecee; }
+td:first-child { max-width: 155px; }
+.member-name { display: block; width: 100%; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; border: none; background: transparent; color: var(--ink); padding: 3px 0; text-align: left; font-weight: 650; }
+.member-name:hover { text-decoration: underline; }
+.badge { padding: 4px 7px; border-radius: 99px; font-size: .69rem; font-weight: 650; white-space: nowrap; }
+.reminders .panel-header { padding-bottom: 13px; }
+.reminders .eyebrow { margin: 2px 0 7px; }
+.reminder-content { margin: 0 15px 13px; }
+.reminder-empty { background: #edf7f7; padding: 13px; border-radius: 9px; }
+.reminder-empty strong { display: block; margin-bottom: 4px; font-size: .83rem; }
+.reminder-row { display: flex; align-items: center; justify-content: space-between; gap: 6px; padding: 9px 3px; }
+.reminder-row + .reminder-row { border-top: 1px solid var(--line); }
+.reminder-row > div { min-width: 0; }
+.reminder-row .member-name { font-size: .85rem; }
+.reminder-note { margin: 0 15px 15px; display: flex; gap: 8px; align-items: baseline; padding: 10px 2px 0; border-top: 1px solid var(--line); color: var(--muted); font-size: .74rem; line-height: 1.4; }
+.reminder-note span { color: var(--orange); }
+footer { margin: 19px 0 0; padding: 16px 2px 23px; border-top: 1px solid var(--line); display: flex; justify-content: space-between; color: var(--muted); font-size: .76rem; gap: 10px; }
+footer span:first-child { font-weight: 650; }
+dialog { color: var(--ink); background: var(--surface); border: 1px solid var(--line); border-radius: 16px; padding: 23px; width: min(440px, calc(100% - 28px)); max-height: calc(100% - 24px); box-shadow: 0 14px 70px #062b4655; }
+dialog::backdrop { background: #062b468c; }
+.dialog-heading { display: flex; justify-content: space-between; gap: 9px; align-items: start; }
+.dialog-heading h2 { overflow-wrap: anywhere; }
+.close { border: none; border-radius: 8px; background: #e9f3f4; color: var(--ink); width: 32px; height: 32px; line-height: 1; font-size: 22px; flex: 0 0 32px; }
+.dialog-intro { margin: 4px 0 14px; color: var(--muted); font-size: .85rem; line-height: 1.45; }
+dialog form label { display: grid; gap: 4px; margin-bottom: 11px; font-size: .82rem; font-weight: 650; }
+dialog select, dialog input { min-height: 38px; width: 100%; font-weight: 400; }
+.coverage { background: #e5f4f4; border-radius: 8px; padding: 9px 11px; color: #20556a; font-size: .81rem; line-height: 1.45; }
+.error { color: var(--rose); margin: 9px 0 0; font-size: .83rem; }
+.dialog-actions, .detail-actions { display: flex; align-items: center; flex-wrap: wrap; gap: 8px; margin-top: 14px; }
+.dialog-actions { justify-content: flex-end; }
+#detail-dialog h3 { margin-top: 18px; font: 600 17px Georgia, serif; }
+#detail-history { list-style: none; padding: 0; margin: 7px 0 0; }
+#detail-history li { border-top: 1px solid var(--line); padding: 9px 0; }
+#detail-history strong { display: block; font-size: .83rem; margin-bottom: 4px; }
+.remove { color: var(--rose); background: transparent; border: 0; padding: 4px 0; text-decoration: underline; font-size: .78rem; }
+.toast { position: fixed; z-index: 5; bottom: 20px; right: 20px; padding: 11px 15px; border-radius: 8px; background: var(--espresso); color: #f8ffff; font-size: .86rem; box-shadow: 0 4px 14px #062b4633; }
+.sr-only { position: absolute; width: 1px; height: 1px; overflow: hidden; clip-path: inset(50%); white-space: nowrap; }
+@media (max-width: 1020px) {
+  .workspace { grid-template-columns: minmax(0, 1fr) 236px; }
+  .shell { width: calc(100% - 40px); }
+}
+@media (max-width: 830px) {
+  .workspace { grid-template-columns: minmax(0, 1fr); }
+  .hero { min-height: 245px; }
+  .hero-art { margin-right: 0; }
+}
+@media (max-width: 560px) {
+  .shell { width: calc(100% - 24px); }
+  .topbar-inner { min-height: 56px; }
+  .hero { margin-top: 14px; min-height: auto; padding: 22px 17px; border-radius: 13px; }
+  .hero-art { position: absolute; right: -34px; top: 12px; width: 215px; opacity: .23; z-index: 0; }
+  .hero-description { max-width: 260px; }
+  .overview { gap: 5px; }
+  .stat { padding: 9px 6px; gap: 4px; }
+  .stat-icon { flex-basis: 20px; height: 20px; border-radius: 5px; font-size: .78rem; }
+  .stat p, .stat small { font-size: .67rem; }
+  .stat strong { font-size: 23px; }
+  .panel-header { padding-inline: 13px; }
+  .controls { padding-inline: 13px; }
+  .table-wrap { overflow: visible; }
+  table, tbody { display: block; white-space: normal; }
+  thead { position: absolute; width: 1px; height: 1px; overflow: hidden; clip-path: inset(50%); }
+  tbody tr { display: grid; grid-template-columns: 1fr 1fr; gap: 6px 9px; padding: 10px 13px; border-top: 1px solid var(--line); }
+  tbody td, tbody td:first-child, tbody td:last-child { border: 0; padding: 0; max-width: none; min-width: 0; }
+  tbody td:first-child { grid-column: span 2; }
+  tbody td[data-label]::before { content: attr(data-label) " "; color: var(--muted); font-size: .7rem; }
+  tbody td:last-child { justify-self: end; }
+}
+
+
+.hero-link { display: inline-block; margin-left: 13px; color: #e4f8f9; font-size: .82rem; text-underline-offset: 4px; }
+.hero-link:hover { color: #9ef5e6; }
+.capsule-section { margin-top: 24px; scroll-margin-top: 18px; }
+.capsule-heading { padding: 3px 1px 11px; }
+.capsule-heading h2 { margin: 4px 0; font-size: 30px; }
+.capsule-heading > p:last-child { color: var(--muted); font-size: .85rem; }
+.capsule-grid { display: grid; grid-template-columns: repeat(2, minmax(0, 1fr)); gap: 16px; align-items: start; }
+.capsule-form { display: flex; flex-wrap: wrap; align-items: end; gap: 8px; padding: 0 19px 12px; }
+.capsule-form label { flex: 1 1 145px; min-width: 0; color: var(--ink); font-weight: 650; font-size: .78rem; }
+.capsule-form label span { color: var(--muted); font-weight: 400; }
+.capsule-form input, .capsule-form select, .menu-export input { display: block; width: 100%; margin-top: 4px; min-height: 39px; }
+.capsule-form label:has([name=person]) { flex-basis: 105px; }
+.capsule-form .serving-field { flex-basis: 240px; }
+.capsule-error { padding: 0 19px 9px; }
+.capsule-list { margin: 0; padding: 0; list-style: none; }
+.capsule-list li { border-top: 1px solid var(--line); padding: 10px 19px; min-height: 43px; }
+.capsule-list .capsule-entry { display: flex; justify-content: space-between; align-items: center; gap: 10px; }
+.capsule-entry strong { display: block; font-size: .85rem; overflow-wrap: anywhere; }
+.capsule-entry .quiet { overflow-wrap: anywhere; }
+.capsule-entry .secondary { min-height: 31px; padding: 5px 9px; flex-shrink: 0; }
+.fund-heading { display: flex; justify-content: space-between; align-items: flex-end; gap: 10px; }
+.fund-heading .primary { flex-shrink: 0; }
+.fund-stats { margin-bottom: 14px; }
+.fund-stats .stat strong { font-size: clamp(1rem, 2.6vw, 1.9rem); overflow-wrap: anywhere; }
+.fund-balance { background: #e1f4f1; border-color: #c1e3de; }
+.negative { color: var(--rose); }
+.fund-grid { display: grid; grid-template-columns: minmax(0, 1fr) minmax(0, 1.12fr); align-items: start; gap: 16px; }
+.metrics-table td, .metrics-table th { text-align: right; font-variant-numeric: tabular-nums; }
+.metrics-table tr > :first-child { text-align: left; }
+.metrics-table tbody th { background: transparent; border-top: 1px solid var(--line); }
+.entry-actions { display: flex; flex-wrap: wrap; justify-content: flex-end; align-items: center; gap: 6px; }
+.purchase-amount { font-size: .85rem; font-weight: 650; white-space: nowrap; }
+.stock-panel { margin-top: 14px; }
+.menu-export { display: flex; flex-wrap: wrap; gap: 8px; align-items: end; padding: 0 19px 15px; }
+.menu-export label { font-size: .8rem; font-weight: 650; }
+.menu-export label span { color: var(--muted); font-weight: 400; }
+.menu-export input { padding: 7px 9px; border: 1px solid var(--line); border-radius: 8px; background: var(--surface); }
+.menu-export p { flex-basis: 100%; }
+.menu-settings { margin: 0 19px 14px; padding-top: 10px; border-top: 1px solid var(--line); }
+.menu-settings summary { cursor: pointer; font-size: .85rem; font-weight: 650; }
+.menu-settings p { margin: 8px 0 0; }
+.menu-settings .menu-export { padding: 8px 0 0; }
+.menu-settings label { flex: 1 1 190px; }
+@media (max-width: 740px) {
+  .capsule-grid, .fund-grid { grid-template-columns: 1fr; }
+}
+@media (max-width: 560px) {
+  .hero-link { margin: 10px 12px 0 0; }
+  .hero .primary { display: flex; }
+  .capsule-form, .capsule-list li, .capsule-error, .menu-export { padding-inline: 13px; }
+  .fund-heading { flex-wrap: wrap; }
+  .fund-grid .table-wrap { overflow-x: auto; }
+  .metrics-table { display: table; white-space: nowrap; }
+  .metrics-table thead { position: static; width: auto; height: auto; clip-path: none; }
+  .metrics-table tbody { display: table-row-group; }
+  .metrics-table tbody tr { display: table-row; }
+  .metrics-table tbody td, .metrics-table tbody td:first-child, .metrics-table tbody td:last-child {
+    border-top: 1px solid var(--line); padding: 9px 8px;
+  }
+  .metrics-table tr > :first-child { padding-left: 13px; }
+  .metrics-table tr > :last-child { padding-right: 13px; }
+}
+</style>
+    <button class="primary" id="hero-add" type="button" disabled>Record payment</button>
+    
+    <section class="overview" aria-label="Membership overview">
+      <div class="stat"><span class="stat-icon green" aria-hidden="true">✓</span><div><p>Active now</p><strong id="active-count">—</strong><small>Current coverage</small></div></div>
+      <div class="stat"><span class="stat-icon amber" aria-hidden="true">◷</span><div><p>Due soon</p><strong id="soon-count">—</strong><small>Within 3 days</small></div></div>
+      <div class="stat"><span class="stat-icon rose" aria-hidden="true">!</span><div><p>Expired</p><strong id="expired-count">—</strong><small>Renewal date passed</small></div></div>
+    </section>
+
+    <section class="workspace" aria-label="Memberships and reminders">
+      <section class="panel members" aria-labelledby="members-title">
+        <header class="panel-header">
+          <div><h2 id="members-title">Members</h2><p>Plans, payments and coverage at a glance.</p></div>
+          <span class="count-tag" id="member-count">—</span>
+        </header>
+        <div class="controls">
+          <label class="search"><span aria-hidden="true">
+            <svg width="16" height="16" viewBox="0 0 20 20" fill="none" stroke="currentColor" stroke-width="1.5"><circle cx="8.5" cy="8.5" r="5.3"/><path d="m12.5 12.5 4 4"/></svg>
+          </span><input id="search" type="search" placeholder="Search members" aria-label="Search members"></label>
+          <select id="filter" aria-label="Filter by membership status">
+            <option value="all">All statuses</option><option value="active">Active</option><option value="soon">Due soon</option><option value="expired">Expired</option>
+          </select>
+        </div>
+        <div id="ledger-message" class="empty" role="status">Loading the ledger…</div>
+        <div class="table-wrap" id="table-wrap" hidden>
+          <table>
+            <thead><tr><th scope="col">Member</th><th scope="col">Plan</th><th scope="col">Paid on</th><th scope="col">Renew by</th><th scope="col">Status</th><th scope="col"><span class="sr-only">Actions</span></th></tr></thead>
+            <tbody id="members-body"></tbody>
+          </table>
+        </div>
+      </section>
+
+      <aside class="panel reminders" aria-labelledby="reminders-title">
+        <header class="panel-header"><div><p class="eyebrow"><span></span> Renewals</p><h2 id="reminders-title">Reminders</h2><p>Upcoming renewals appear here three days ahead.</p></div></header>
+        <div class="reminder-content" id="reminders-list" aria-live="polite"><p class="quiet">Loading reminders…</p></div>
+        <div class="reminder-note"><span aria-hidden="true">▦</span><p>Open a member’s details to download a calendar reminder.</p></div>
+      </aside>
+    </section>
+
+    <section class="capsule-section" id="fund" aria-labelledby="fund-title">
+      <header class="capsule-heading fund-heading">
+        <div>
+          <p class="eyebrow"><span></span> Contributions and spending</p>
+          <h2 id="fund-title">Coffee fund</h2>
+          <p id="fund-rates" class="quiet">Contributions are counted on the day they’re paid.</p>
+        </div>
+        <button class="primary" id="expense-add" type="button" disabled><span class="plus" aria-hidden="true">+</span> Record purchase</button>
+      </header>
+      <div class="overview fund-stats" aria-label="All-time fund totals">
+        <div class="stat fund-balance"><div><p>Fund balance</p><strong id="fund-balance">—</strong><small>Collected minus spent</small></div></div>
+        <div class="stat"><div><p>Total collected</p><strong id="fund-collected">—</strong><small id="fund-payment-count">Recorded payments</small></div></div>
+        <div class="stat"><div><p>Total spent</p><strong id="fund-spent">—</strong><small id="fund-purchase-count">Recorded purchases</small></div></div>
+      </div>
+      <div class="fund-grid">
+        <section class="panel" aria-labelledby="purchase-title">
+          <header class="panel-header"><div><h2 id="purchase-title">Purchase history</h2><p>What was bought, when, and how much it cost.</p></div></header>
+          <p class="error capsule-error" id="expense-list-error" role="alert" hidden></p>
+          <ul class="capsule-list" id="expense-list" aria-live="polite"><li class="quiet">Loading purchases…</li></ul>
+        </section>
+        <section class="panel" aria-labelledby="metrics-title">
+          <header class="panel-header"><div><h2 id="metrics-title">Monthly activity</h2><p>Cash flow and stockouts over the last six months.</p></div></header>
+          <div class="table-wrap">
+            <table class="metrics-table">
+              <thead><tr><th scope="col">Month</th><th scope="col">Collected</th><th scope="col">Spent</th><th scope="col">Net</th><th scope="col">Ran out</th></tr></thead>
+              <tbody id="metrics-body"><tr><td colspan="5" class="quiet">Loading activity…</td></tr></tbody>
+            </table>
+          </div>
+        </section>
+      </div>
+    </section>
+
+    
+    
+  <dialog id="payment-dialog" aria-labelledby="payment-title">
+    <form id="payment-form">
+      <div class="dialog-heading"><h2 id="payment-title">Record payment</h2><button type="button" class="close" data-close="payment-dialog" aria-label="Close payment form">×</button></div>
+      <p class="dialog-intro">Log a contribution you’ve already received.</p>
+      <label id="member-select-label">Member<select id="member-select"></select></label>
+      <label id="member-name-label">Member name<input id="member-name" maxlength="80" autocomplete="off" placeholder="e.g. Alex Morgan"></label>
+      <label>Plan<select id="plan"><option value="fortnight">2 weeks</option><option value="month">1 month</option></select></label>
+      <label>Payment date<input id="paid-on" type="date" min="2000-01-01" required></label>
+      <p class="coverage" id="coverage"></p>
+      <p class="error" id="payment-error" role="alert" hidden></p>
+      <div class="dialog-actions"><button class="secondary" type="button" data-close="payment-dialog">Cancel</button><button class="primary" id="payment-save" type="submit">Save payment</button></div>
+    </form>
+  </dialog>
+
+  <dialog id="detail-dialog" aria-labelledby="detail-title">
+    <div class="dialog-heading"><h2 id="detail-title">Member details</h2><button type="button" class="close" data-close="detail-dialog" aria-label="Close member details">×</button></div>
+    <p class="dialog-intro" id="detail-summary"></p>
+    <div class="detail-actions"><button class="primary" type="button" id="detail-renew">Record renewal</button><button class="secondary" type="button" id="detail-calendar">Download calendar reminder</button></div>
+    <h3>Payment history</h3>
+    <ul id="detail-history"></ul>
+    <p class="error" id="detail-error" role="alert" hidden></p>
+    <div class="detail-actions"><button class="remove" type="button" id="detail-remove">Remove latest payment</button></div>
+  </dialog>
+  <dialog id="expense-dialog" aria-labelledby="expense-title">
+    <form id="expense-form">
+      <div class="dialog-heading"><h2 id="expense-title">Record purchase</h2><button type="button" class="close" data-close="expense-dialog" aria-label="Close purchase form">×</button></div>
+      <p class="dialog-intro">Record what you spent from the coffee fund.</p>
+      <label>Purchase<input id="expense-description" maxlength="120" required placeholder="e.g. Three sleeves of Vertuo capsules"></label>
+      <label>Amount (HUF)<input id="expense-amount" type="number" min="1" max="1000000000" step="1" required></label>
+      <label>Category<select id="expense-category"><option value="coffee">Coffee</option><option value="maintenance">Maintenance</option><option value="other">Other</option></select></label>
+      <label>Purchase date<input id="expense-date" type="date" min="2000-01-01" required></label>
+      <p class="error" id="expense-error" role="alert" hidden></p>
+      <div class="dialog-actions"><button class="secondary" type="button" data-close="expense-dialog">Cancel</button><button class="primary" id="expense-save" type="submit">Save purchase</button></div>
+    </form>
+  </dialog>
+  
+    <div id="toast" role="status" class="toast" hidden></div>
+  </template>
   <script>const menuData = {"cupVolumes":[{"ml":40,"name":"Espresso"},{"ml":80,"name":"Double Espresso"},{"ml":150,"name":"Gran Lungo"},{"ml":230,"name":"Mug"},{"ml":355,"name":"Alto XL"}],"servingOptions":[{"label":"Black · as brewed"},{"label":"Over ice","recipe":"https://www.nespresso.com/ncp/res/generated/recipes/22687NES_en_INT.pdf"},{"label":"Iced latte","recipe":"https://www.nespresso.com/ncp/res/generated/recipes/28491FLA_en_AU.pdf"},{"label":"With 40 ml milk · club option"},{"label":"Reverso · 50 ml cold milk first","recipe":"https://www.nespresso.com/ncp/res/generated/recipes/37624REV_en_INT.pdf"},{"label":"Vanilla Almond Reverso · 40 ml oat or soy drink","recipe":"https://www.nespresso.com/coffee-blog/recetas/vanilla-almond-reverso"},{"label":"Cappuccino · frothed milk","capsule":"Bianco Doppio"},{"label":"Latte macchiato · milk and foam","recipe":"https://www.nespresso.com/ncp/res/generated/recipes/36191GOU_en_INT.pdf"}],"catalogRoot":"https://www.nespresso.com/hu/en/order/capsules/vertuo","products":{"altissio":"altissio-espresso-pods","altissio decaffeinato":"altissio-decaffeinato-coffee-pods","arondio":"arondio-coffee-pods","bianco doppio":"bianco-doppio-coffee-capsule","bianco forte":"bianco-forte-coffee-capsule","diavolitto":"diavolitto-espresso-pods","double espresso chiaro":"double-espresso-chiaro-coffee-pods","double espresso chiaro decaffeinato":"double-espresso-chiaro-decaffeinato","double espresso dolce":"double-espresso-dolce-coffee-pods","double espresso scuro":"double-espresso-scuro-coffee-pods","fortado":"fortado-coffee-pods","fortado decaffeinato":"fortado-decaffeinato-coffee-pods","half caffeinato":"half-caffeinato-coffee-pods","ice forte":"iced-coffee-capsule-forte-2025","ice leggero":"iced-coffee-capsule-leggero-2025","il caffe":"il-caffe-coffee-pods","inizio":"inizio-coffee-pods","intenso":"intenso-coffee-pods","melozio":"melozio-coffee-pods","odacio":"odacio-coffee-pods","orafio":"orafio-coffee-pods","rich chocolate":"rich-chocolate-flavoured-coffee-capsule","roasted hazelnut":"roasted-hazelnut-flavoured-coffee-capsule","solelio":"solelio-coffee-pods","stormio":"stormio-coffee-pods","sweet vanilla":"sweet-vanilla-flavoured-coffee-capsule","sweet vanilla decaffeinato":"sweet-vanilla-decaffeinato","voltesso":"voltesso-espresso-pods"}};
 function titleCaseFlavor(value) {
   return value.toLowerCase().replace(/(^|[^\p{L}\p{M}\p{N}'’])(\p{L})/gu,
@@ -417,6 +763,465 @@ function flavorCards(entries) {
   return cards ? `<ul class="flavors">${cards}</ul>` : '<p class="empty">The cupboard is empty right now.</p>';
 }
 
+function mountLedger(root, api) {
+  const $ = id => root.getElementById(id);
+  let stockHistory;
+  const state = { today: '', payments: [], members: [], loaded: false };
+  const planName = { fortnight: '2 weeks', month: '1 month' };
+  const money = new Intl.NumberFormat('en-GB', { style: 'currency', currency: 'HUF', currencyDisplay: 'code', maximumFractionDigits: 0 });
+  const dateFormat = new Intl.DateTimeFormat('en-GB', {
+    day: 'numeric', month: 'short', year: 'numeric', timeZone: 'UTC'
+  });
+  const day = value => new Date(value + 'T00:00:00Z');
+  const format = value => dateFormat.format(day(value));
+  const daysBetween = (start, end) => Math.round((day(end) - day(start)) / 86400000);
+  const daysLeft = row => daysBetween(state.today, row.renew_on);
+  const kind = row => daysLeft(row) < 0 ? 'expired' : daysLeft(row) <= 3 ? 'soon' : 'active';
+  const statuses = { expired: ['Expired', 'rose'], soon: ['Due soon', 'amber'], active: ['Active', 'green'] };
+  const overdueText = n => n === 0 ? 'Due today' : n === 1 ? 'Tomorrow' : 'In ' + n + ' days';
+
+  function node(tag, className, content) {
+    const item = document.createElement(tag);
+    if (className) item.className = className;
+    if (content !== undefined) item.textContent = content;
+    return item;
+  }
+
+  function button(className, content, onClick) {
+    const item = node('button', className, content);
+    item.type = 'button';
+    item.addEventListener('click', onClick);
+    return item;
+  }
+
+  function badge(text, color) {
+    return node('span', 'badge ' + color, text);
+  }
+
+  function emptyState(title, description, icon = '☕') {
+    const mark = node('span', 'empty-mark', icon);
+    mark.setAttribute('aria-hidden', 'true');
+    return [mark, node('strong', '', title), node('p', '', description)];
+  }
+
+  async function load() {
+    const data = await api('/api/ledger');
+    state.today = data.today;
+    state.payments = data.payments;
+    if (Array.isArray(data.stock_history)) stockHistory = data.stock_history;
+    for (const option of $('plan').options) {
+      option.textContent = planName[option.value] + ' · ' + money.format(data.rates[option.value]);
+    }
+    $('fund-rates').textContent = 'Two weeks adds ' + money.format(data.rates.fortnight) +
+      '. One month adds ' + money.format(data.rates.month) + '.';
+    const newest = new Map();
+    for (const payment of data.payments) {
+      if (!newest.has(payment.member_id)) newest.set(payment.member_id, payment);
+    }
+    state.members = [...newest.values()].sort((a, b) => a.name.localeCompare(b.name));
+    state.loaded = true;
+    $('hero-add').disabled = false;
+    render();
+    renderFund();
+  }
+
+  function render() {
+    const near = state.members.filter(row => kind(row) === 'soon')
+      .sort((a, b) => a.renew_on.localeCompare(b.renew_on));
+    $('active-count').textContent = state.members.filter(row => daysLeft(row) > 0).length;
+    $('soon-count').textContent = near.length;
+    $('expired-count').textContent = state.members.filter(row => kind(row) === 'expired').length;
+    $('member-count').textContent = state.members.length + (state.members.length === 1 ? ' member' : ' members');
+    renderTable();
+
+    const reminders = $('reminders-list');
+    if (!near.length) {
+      const item = node('div', 'reminder-empty');
+      item.append(node('strong', '', 'No renewals due soon'), node('p', 'quiet',
+        state.members.length ? 'Upcoming renewals will appear here.' : 'Record a payment to start tracking renewals.'));
+      reminders.replaceChildren(item);
+      return;
+    }
+    reminders.replaceChildren(...near.map(row => {
+      const item = node('div', 'reminder-row');
+      const person = node('div');
+      person.append(button('member-name', row.name, () => openDetails(row)), node('p', 'quiet', format(row.renew_on)));
+      item.append(person, badge(overdueText(daysLeft(row)), 'amber'));
+      return item;
+    }));
+  }
+
+  function renderTable() {
+    if (!state.loaded) return;
+    const filter = $('filter').value;
+    const query = $('search').value.trim().toLocaleLowerCase();
+    const rows = state.members.filter(row =>
+      row.name.toLocaleLowerCase().includes(query) && (filter === 'all' || filter === kind(row)));
+    $('table-wrap').hidden = !rows.length;
+    $('ledger-message').hidden = !!rows.length;
+    if (!rows.length) {
+      $('ledger-message').replaceChildren(...(state.members.length
+        ? emptyState('No matching members', 'Try a different name or status.', '⌕')
+        : emptyState('No payments recorded', 'Use Record payment to add your first member.')));
+      return;
+    }
+    $('members-body').replaceChildren(...rows.map(row => {
+      const tr = node('tr');
+      const member = node('td');
+      const name = button('member-name', row.name, () => openDetails(row));
+      name.title = row.name;
+      member.append(name);
+      tr.append(member);
+      for (const [label, text] of [['Plan', planName[row.plan]], ['Paid', format(row.paid_on)], ['Renew by', format(row.renew_on)]]) {
+        const td = node('td', '', text);
+        td.dataset.label = label;
+        tr.append(td);
+      }
+      const status = node('td');
+      status.append(badge(...statuses[kind(row)]));
+      tr.append(status);
+      const actions = node('td');
+      const renew = button('secondary', 'Renew', () => openPayment(row));
+      renew.setAttribute('aria-label', 'Record renewal for ' + row.name);
+      actions.append(renew);
+      tr.append(actions);
+      return tr;
+    }));
+  }
+
+  function endDate(start, plan) {
+    const date = day(start);
+    if (plan === 'fortnight') {
+      date.setUTCDate(date.getUTCDate() + 14);
+    } else {
+      const startDay = date.getUTCDate();
+      date.setUTCDate(1);
+      date.setUTCMonth(date.getUTCMonth() + 1);
+      const last = new Date(date);
+      last.setUTCMonth(last.getUTCMonth() + 1, 0);
+      date.setUTCDate(Math.min(startDay, last.getUTCDate()));
+    }
+    return date.toISOString().slice(0, 10);
+  }
+
+  let paymentId;
+  let details;
+  let toastTimer;
+  const paymentDialog = $('payment-dialog');
+  const detailDialog = $('detail-dialog');
+  const selectedMember = () => state.members.find(row => row.member_id === $('member-select').value);
+
+  function openPayment(row) {
+    $('payment-form').reset();
+    const options = [new Option('Add a new member', ''), ...state.members.map(person =>
+      new Option(person.name, person.member_id))];
+    $('member-select').replaceChildren(...options);
+    $('member-select').value = row?.member_id || '';
+    $('member-select-label').hidden = !state.members.length;
+    $('paid-on').max = state.today;
+    $('paid-on').value = state.today;
+    $('plan').value = row?.plan || 'fortnight';
+    $('payment-error').hidden = true;
+    $('payment-save').disabled = false;
+    paymentId = crypto.randomUUID();
+    updateCoverage();
+    paymentDialog.showModal();
+    (row ? $('plan') : state.members.length ? $('member-select') : $('member-name')).focus();
+  }
+
+  function updateCoverage() {
+    const member = selectedMember();
+    const date = $('paid-on');
+    $('payment-title').textContent = member ? 'Record renewal' : 'Record payment';
+    $('member-name-label').hidden = !!member;
+    $('member-name').required = !member;
+    date.min = member?.paid_on || '2000-01-01';
+    if (!date.value || !date.validity.valid) {
+      $('coverage').textContent = 'Choose a valid payment date to preview coverage.';
+      return;
+    }
+    const start = member && member.renew_on > date.value ? member.renew_on : date.value;
+    $('coverage').textContent = 'Coverage starts ' + format(start) +
+      '. Renew by ' + format(endDate(start, $('plan').value)) + '.';
+  }
+
+  function showError(id, error) {
+    $(id).textContent = error.message;
+    $(id).hidden = false;
+  }
+
+  function notify(message) {
+    clearTimeout(toastTimer);
+    $('toast').textContent = message;
+    $('toast').hidden = false;
+    toastTimer = setTimeout(() => { $('toast').hidden = true; }, 4200);
+  }
+
+  $('payment-form').addEventListener('submit', async event => {
+    event.preventDefault();
+    const save = $('payment-save');
+    if (save.disabled) return;
+    save.disabled = true;
+    $('payment-error').hidden = true;
+    const member = selectedMember();
+    try {
+      await api('/api/payments', 'POST', {
+        id: paymentId,
+        memberId: member?.member_id,
+        priorId: member?.id,
+        name: $('member-name').value,
+        plan: $('plan').value,
+        paidOn: $('paid-on').value
+      });
+      paymentDialog.close();
+      notify('Payment recorded.');
+      try { await load(); } catch (error) { notify('Payment saved. Reload the page to refresh the ledger.'); }
+    } catch (error) {
+      showError('payment-error', error);
+    } finally {
+      save.disabled = false;
+    }
+  });
+
+  function openDetails(row) {
+    details = row;
+    $('detail-title').textContent = row.name;
+    $('detail-summary').textContent = daysLeft(row) < 0
+      ? 'Coverage ended on ' + format(row.renew_on) + '.'
+      : 'Renew by ' + format(row.renew_on) + '.';
+    $('detail-calendar').disabled = daysLeft(row) < 0;
+    $('detail-error').hidden = true;
+    $('detail-remove').disabled = false;
+    $('detail-history').replaceChildren(...state.payments.filter(p => p.member_id === row.member_id).map(p => {
+      const item = node('li');
+      item.append(
+        node('strong', '', planName[p.plan] + ' · ' + money.format(p.amount) + ' paid ' + format(p.paid_on)),
+        node('p', 'quiet', 'From ' + format(p.starts_on) + ' · Renew by ' + format(p.renew_on))
+      );
+      return item;
+    }));
+    detailDialog.showModal();
+  }
+
+  function icalText(value) {
+    return value.replace(/\\/g, '\\\\').replace(/\r?\n/g, '\\n').replace(/([,;])/g, '\\$1');
+  }
+
+  function foldCalendarLine(line) {
+    const encoder = new TextEncoder();
+    let length = 0;
+    let result = '';
+    for (const character of line) {
+      const size = encoder.encode(character).length;
+      if (length + size > 75) {
+        result += '\r\n ';
+        length = 1;
+      }
+      result += character;
+      length += size;
+    }
+    return result;
+  }
+
+  function downloadReminder(row) {
+    const lead = Math.max(0, Math.min(3, daysLeft(row) - 1));
+    const reminder = 'Coffee Club renewal: ' + row.name;
+    const lines = [
+      'BEGIN:VCALENDAR', 'VERSION:2.0', 'PRODID:-//Coffee Club//Renewal reminders//EN',
+      'CALSCALE:GREGORIAN', 'BEGIN:VEVENT',
+      'UID:' + row.id + '@' + location.hostname,
+      'DTSTAMP:' + new Date().toISOString().replace(/[-:]|\.\d{3}/g, ''),
+      'DTSTART;VALUE=DATE:' + row.renew_on.replaceAll('-', ''),
+      'SUMMARY:' + icalText(reminder),
+      'DESCRIPTION:' + icalText('Check whether ' + row.name + ' has renewed their Coffee Club membership.'),
+      'TRANSP:TRANSPARENT',
+      'BEGIN:VALARM', 'ACTION:DISPLAY', 'TRIGGER:' + (lead ? '-P' + lead + 'D' : 'PT0S'),
+      'DESCRIPTION:' + icalText(reminder), 'END:VALARM', 'END:VEVENT', 'END:VCALENDAR', ''
+    ];
+    const file = new Blob([lines.map(foldCalendarLine).join('\r\n')], { type: 'text/calendar;charset=utf-8' });
+    const url = URL.createObjectURL(file);
+    const anchor = node('a');
+    anchor.href = url;
+    anchor.download = 'coffee-club-renewal.ics';
+    document.body.append(anchor);
+    anchor.click();
+    anchor.remove();
+    setTimeout(() => URL.revokeObjectURL(url), 1000);
+  }
+
+  $('hero-add').addEventListener('click', () => openPayment());
+  $('search').addEventListener('input', renderTable);
+  $('filter').addEventListener('change', renderTable);
+  for (const id of ['member-select', 'paid-on', 'plan']) $(id).addEventListener('input', updateCoverage);
+  for (const trigger of root.querySelectorAll('[data-close]')) {
+    trigger.addEventListener('click', () => $(trigger.dataset.close).close());
+  }
+  $('detail-renew').addEventListener('click', () => {
+    detailDialog.close();
+    openPayment(details);
+  });
+  $('detail-calendar').addEventListener('click', () => downloadReminder(details));
+  $('detail-remove').addEventListener('click', async () => {
+    if (!confirm('Remove the latest payment for ' + details.name + '?')) return;
+    $('detail-remove').disabled = true;
+    $('detail-error').hidden = true;
+    try {
+      await api('/api/payments', 'DELETE', { id: details.id, memberId: details.member_id });
+      detailDialog.close();
+      notify('Latest payment removed.');
+      try { await load(); } catch (error) { notify('Payment removed. Reload the page to refresh the ledger.'); }
+    } catch (error) {
+      showError('detail-error', error);
+    } finally {
+      $('detail-remove').disabled = false;
+    }
+  });
+
+  async function initialLoad() {
+    try {
+      await load();
+    } catch (error) {
+      $('ledger-message').replaceChildren(...emptyState('Could not open the ledger', error.message, '!'),
+        button('secondary', 'Try again', initialLoad));
+      $('reminders-list').replaceChildren(node('p', 'quiet', 'Reminders are unavailable until the ledger loads.'));
+    }
+  }
+
+  const expenseDialog = $('expense-dialog');
+  const categories = { coffee: 'Coffee', maintenance: 'Maintenance', other: 'Other' };
+  const monthFormat = new Intl.DateTimeFormat('en-GB', { month: 'short', year: 'numeric', timeZone: 'UTC' });
+  let expenses;
+  let expenseId;
+
+  function total(rows) {
+    return rows.reduce((sum, row) => sum + row.amount, 0);
+  }
+
+  function renderFund() {
+    if (expenses) $('fund-spent').textContent = money.format(total(expenses));
+    if (state.loaded) {
+      $('fund-collected').textContent = money.format(total(state.payments));
+      $('fund-payment-count').textContent = state.payments.length + (state.payments.length === 1 ? ' payment' : ' payments');
+    }
+    $('expense-add').disabled = !state.loaded || !expenses;
+    if (!state.loaded || !expenses) return;
+    const balance = total(state.payments) - total(expenses);
+    $('fund-balance').textContent = money.format(balance);
+    $('fund-balance').classList.toggle('negative', balance < 0);
+    const currentMonth = day(state.today.slice(0, 7) + '-01');
+    $('metrics-body').replaceChildren(...Array.from({ length: 6 }, (_, index) => {
+      const month = new Date(currentMonth);
+      month.setUTCMonth(month.getUTCMonth() - index);
+      const key = month.toISOString().slice(0, 7);
+      const income = total(state.payments.filter(row => row.paid_on.startsWith(key)));
+      const spent = total(expenses.filter(row => row.purchased_on.startsWith(key)));
+      const out = stockHistory ? stockHistory.filter(row => row.ran_out_on.startsWith(key)).length : '—';
+      const row = node('tr');
+      const label = node('th', '', monthFormat.format(month));
+      label.scope = 'row';
+      row.append(label, node('td', '', money.format(income)), node('td', '', money.format(spent)),
+        node('td', income < spent ? 'negative' : '', money.format(income - spent)), node('td', '', out));
+      return row;
+    }));
+  }
+
+  async function loadExpenses() {
+    const data = await api('/api/expenses');
+    expenses = data.expenses;
+    $('fund-purchase-count').textContent = expenses.length + (expenses.length === 1 ? ' purchase' : ' purchases');
+    $('expense-list').replaceChildren(...(expenses.length ? expenses.map(entry => {
+      const item = node('li', 'capsule-entry');
+      const info = node('div');
+      info.append(node('strong', '', entry.description),
+        node('p', 'quiet', categories[entry.category] + ' · ' + format(entry.purchased_on)));
+      const actions = node('div', 'entry-actions');
+      const remove = button('secondary', 'Remove', async () => {
+        if (!confirm('Remove this purchase from the fund?')) return;
+        remove.disabled = true;
+        $('expense-list-error').hidden = true;
+        try {
+          await api('/api/expenses', 'DELETE', { id: entry.id });
+          await loadExpenses();
+          notify('Purchase removed.');
+        } catch (error) {
+          showError('expense-list-error', error);
+        } finally {
+          remove.disabled = false;
+        }
+      });
+      remove.setAttribute('aria-label', 'Remove purchase ' + entry.description);
+      actions.append(node('span', 'purchase-amount', money.format(entry.amount)), remove);
+      item.append(info, actions);
+      return item;
+    }) : [node('li', 'quiet', 'No purchases recorded yet.')]));
+    renderFund();
+  }
+
+  $('expense-add').addEventListener('click', () => {
+    $('expense-form').reset();
+    $('expense-date').max = state.today;
+    $('expense-date').value = state.today;
+    $('expense-error').hidden = true;
+    expenseId = crypto.randomUUID();
+    expenseDialog.showModal();
+    $('expense-description').focus();
+  });
+
+  $('expense-form').addEventListener('submit', async event => {
+    event.preventDefault();
+    const save = $('expense-save');
+    if (save.disabled) return;
+    save.disabled = true;
+    $('expense-error').hidden = true;
+    try {
+      await api('/api/expenses', 'POST', {
+        id: expenseId, description: $('expense-description').value, amount: $('expense-amount').valueAsNumber,
+        category: $('expense-category').value, purchasedOn: $('expense-date').value
+      });
+      expenseDialog.close();
+      try {
+        await loadExpenses();
+        notify('Purchase recorded.');
+      } catch { notify('Purchase saved. Reload to refresh the fund.'); }
+    } catch (error) {
+      showError('expense-error', error);
+    } finally {
+      save.disabled = false;
+    }
+  });
+
+  async function initialExpenseLoad() {
+    try {
+      await loadExpenses();
+    } catch (error) {
+      const item = node('li', 'capsule-entry');
+      item.append(node('span', 'quiet', error.message), button('secondary', 'Try again', initialExpenseLoad));
+      $('expense-list').replaceChildren(item);
+      $('metrics-body').querySelector('td').textContent = 'Purchase totals are unavailable.';
+    }
+  }
+
+  const localToday = new Intl.DateTimeFormat('en-CA', {
+    timeZone: 'Europe/Budapest', year: 'numeric', month: '2-digit', day: '2-digit'
+  });
+  const refreshTimer = setInterval(() => {
+    if (state.loaded && !paymentDialog.open && !detailDialog.open && document.visibilityState === 'visible' &&
+        state.today !== localToday.format(new Date())) {
+      load().catch(() => {});
+    }
+  }, 60000);
+
+  initialLoad();
+  initialExpenseLoad();
+  return {
+    node, button, badge, format, showError, notify,
+    refresh: initialLoad,
+    refreshAll() { return Promise.all([initialLoad(), initialExpenseLoad()]); },
+    updateStockHistory(rows) { stockHistory = rows; renderFund(); },
+    dispose() { clearInterval(refreshTimer); clearTimeout(toastTimer); }
+  };
+}
+
 const byId = id => document.getElementById(id);
 const suggestions = byId('suggestions');
 const suggestionForm = byId('suggestion-form');
@@ -474,7 +1279,9 @@ async function backend(path, { method = 'GET', body, token, prefer } = {}) {
   if (!response.ok) {
     const error = new Error('Could not connect to the suggestion inbox.');
     error.status = response.status;
-    error.code = (await response.json().catch(() => null))?.code;
+    const problem = await response.json().catch(() => null);
+    error.code = problem?.code;
+    if (problem?.code === '22023') error.detail = problem.message;
     throw error;
   }
   return response.status === 204 ? null : response.json();
@@ -560,6 +1367,7 @@ function clearAdmin(message = '') {
   clearTimeout(expiryTimer);
   reviewList.replaceChildren();
   clearStockAdmin();
+  clearOnlineLedger();
   review.hidden = true;
   loginForm.hidden = false;
   byId('admin-password').value = '';
@@ -594,7 +1402,7 @@ loginForm.addEventListener('submit', async event => {
     loginForm.hidden = true;
     review.hidden = false;
     reviewFilter.value = 'approved';
-    await Promise.all([loadInbox(), loadStockAdmin()]);
+    await Promise.all([loadInbox(), loadStockAdmin(), loadOnlineLedger()]);
   } catch {
     clearAdmin('Couldn’t sign in. Check your email and password, then try again.');
   } finally {
@@ -864,6 +1672,7 @@ async function saveStock(row, values, message, reset) {
     if (accessToken !== token) return;
     reset();
     await loadStockAdmin(result.length ? message : 'This flavor was updated elsewhere. The cupboard has been refreshed.');
+    if (values.ran_out_on) refreshOnlineLedger();
   } catch (error) {
     if (accessToken !== token) return;
     if (error.status === 401 || error.status === 403) {
@@ -904,6 +1713,130 @@ stockOutForm.addEventListener('submit', event => {
 });
 stockCancel.addEventListener('click', () => { if (!stockPending) resetStockEditor(); });
 byId('stock-out-cancel').addEventListener('click', () => { if (!stockPending) resetStockOut(); });
-if (connected && !adminView) loadPublicStock();</script>
+if (connected && !adminView) loadPublicStock();
+
+const ledgerHost = byId('online-ledger');
+const ledgerStatus = byId('online-ledger-status');
+const ledgerTools = byId('ledger-backup-tools');
+const ledgerImportForm = byId('ledger-import-form');
+const ledgerImportFile = byId('ledger-import-file');
+const ledgerDownload = byId('ledger-download');
+let onlineLedger;
+
+const ledgerActions = {
+  'GET /api/ledger': 'ledger',
+  'GET /api/expenses': 'expenses',
+  'POST /api/payments': 'record_payment',
+  'DELETE /api/payments': 'remove_payment',
+  'POST /api/expenses': 'record_expense',
+  'DELETE /api/expenses': 'remove_expense'
+};
+
+async function onlineLedgerRequest(token, action, body = {}) {
+  if (!token || token !== accessToken) throw new Error('Sign in to open the ledger.');
+  try {
+    const result = await backend('/rest/v1/rpc/coffee_ledger', {
+      method: 'POST', token, body: { p_action: action, p_body: body }
+    });
+    if (token !== accessToken) throw new Error('Sign in to open the ledger.');
+    return result;
+  } catch (error) {
+    if (token === accessToken && [401, 403].includes(error.status)) {
+      clearAdmin('Sign in again to open the ledger.');
+    }
+    if (error.code === 'PGRST202') throw new Error('The online ledger is awaiting database setup.');
+    throw new Error(error.detail || 'Could not complete the ledger request. Try again.');
+  }
+}
+
+function clearOnlineLedger() {
+  onlineLedger?.dispose();
+  onlineLedger = undefined;
+  ledgerHost.replaceChildren();
+  ledgerStatus.textContent = '';
+  ledgerTools.hidden = true;
+  ledgerTools.open = false;
+  ledgerImportForm.reset();
+  ledgerImportForm.querySelector('button[type="submit"]').disabled = false;
+  ledgerDownload.disabled = false;
+}
+
+async function loadOnlineLedger() {
+  const token = accessToken;
+  ledgerStatus.textContent = 'Loading the private ledger…';
+  try {
+    let firstRead = await onlineLedgerRequest(token, 'ledger');
+    if (token !== accessToken) return;
+    const host = document.createElement('div');
+    const root = host.attachShadow({ mode: 'open' });
+    root.append(byId('online-ledger-template').content.cloneNode(true));
+    ledgerHost.replaceChildren(host);
+    onlineLedger = mountLedger(root, (path, method = 'GET', body) => {
+      const action = ledgerActions[method + ' ' + path];
+      if (action === 'ledger' && firstRead) {
+        const data = firstRead;
+        firstRead = null;
+        return Promise.resolve(data);
+      }
+      return onlineLedgerRequest(token, action, body);
+    });
+    ledgerTools.hidden = false;
+    ledgerStatus.textContent = '';
+  } catch (error) {
+    if (token === accessToken) ledgerStatus.textContent = error.message;
+  }
+}
+
+function refreshOnlineLedger() {
+  onlineLedger?.refresh();
+}
+
+ledgerImportForm.addEventListener('submit', async event => {
+  event.preventDefault();
+  const file = ledgerImportFile.files[0];
+  if (!file || file.size > 1048576) {
+    ledgerStatus.textContent = 'Choose a Coffee Club backup file under 1 MB.';
+    return;
+  }
+  const token = accessToken;
+  const submit = ledgerImportForm.querySelector('button[type="submit"]');
+  if (submit.disabled) return;
+  submit.disabled = true;
+  ledgerStatus.textContent = 'Importing the backup…';
+  try {
+    let backup;
+    try { backup = JSON.parse(await file.text()); }
+    catch { throw new Error('Choose a valid Coffee Club backup file.'); }
+    await onlineLedgerRequest(token, 'import', backup);
+    ledgerImportForm.reset();
+    ledgerStatus.textContent = 'Windows ledger imported.';
+    await onlineLedger?.refreshAll();
+  } catch (error) {
+    if (token === accessToken) ledgerStatus.textContent = error.message;
+  } finally {
+    if (token === accessToken) submit.disabled = false;
+  }
+});
+
+ledgerDownload.addEventListener('click', async () => {
+  const token = accessToken;
+  if (ledgerDownload.disabled) return;
+  ledgerDownload.disabled = true;
+  try {
+    const data = await onlineLedgerRequest(token, 'backup');
+    const url = URL.createObjectURL(new Blob([JSON.stringify(data)], { type: 'application/json' }));
+    const link = document.createElement('a');
+    link.href = url;
+    link.download = 'coffee-club-ledger.json';
+    document.body.append(link);
+    link.click();
+    link.remove();
+    setTimeout(() => URL.revokeObjectURL(url), 1000);
+  } catch (error) {
+    if (token === accessToken) ledgerStatus.textContent = error.message;
+  } finally {
+    if (token === accessToken) ledgerDownload.disabled = false;
+  }
+});</script>
 </body>
 </html>
